@@ -1,0 +1,4 @@
+{
+  "host": "mock-server-app.feathersjs.com",
+  "port": "PORT"
+}

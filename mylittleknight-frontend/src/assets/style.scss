@@ -1,0 +1,71 @@
+@font-face {
+  font-family: 'Minecraft';
+  src: url('Minecraft.ttf');
+}
+@font-face {
+  font-family: 'Silom';
+  src: url('Silom.ttf');
+}
+@font-face {
+  font-family: 'Hiragino Sans GB';
+  src: url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.eot');
+  src: url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.eot?#iefix')
+      format('embedded-opentype'),
+    url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.woff2')
+      format('woff2'),
+    url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.woff')
+      format('woff'),
+    url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.ttf')
+      format('truetype'),
+    url('//db.onlinewebfonts.com/t/3b2646a48566403a55f62ceddbecbe18.svg#Hiragino Sans GB')
+      format('svg');
+}
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: all 0.5s;
+}
+.zoom-enter, .zoom-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  transform: scale(0.5);
+  opacity: 0;
+}
+/* 改变主题色变量 */
+$--color-primary: #f72e54;
+$--color-secondary: #22d2a2;
+$--color-alert: #ffce25;
+h1,
+h2,
+p,
+b {
+  pointer-events: none;
+}
+.el-button:focus,
+.el-button:hover {
+  border-color: transparent !important;
+}
+button:hover {
+  transform: scale(1.1);
+  transition: all 400ms;
+}
+button:active {
+  transform: scale(0.7);
+  transition: all 200ms;
+}
+html {
+  font-size: 1.1rem;
+}
+.el-dialog{
+  z-index: 99999;
+}

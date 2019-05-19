@@ -1,0 +1,48 @@
+{
+  "name": "mylittleknight-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@feathersjs/authentication-client": "^1.0.11",
+    "@feathersjs/feathers": "^3.3.1",
+    "@feathersjs/socketio-client": "^1.2.1",
+    "@tweenjs/tween.js": "^17.3.0",
+    "core-js": "^2.6.5",
+    "element-ui": "^2.8.2",
+    "feathers-vuex": "^1.7.0",
+    "pixi-viewport": "^3.21.0",
+    "pixi.js": "^4.8.7",
+    "prettier-eslint": "^8.8.2",
+    "socket.io-client": "^2.2.0",
+    "vue": "^2.6.10",
+    "vue-easeljs": "^0.1.1",
+    "vue-functional-calendar": "^2.3.4",
+    "vue-router": "^3.0.3",
+    "vue-typed-js": "^0.1.2",
+    "vuex": "^3.0.1",
+    "vuex-persistedstate": "^2.5.4"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.7.0",
+    "@vue/cli-plugin-eslint": "^3.7.0",
+    "@vue/cli-service": "^3.7.0",
+    "@vue/eslint-config-prettier": "^4.0.1",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-vue": "^5.2.2",
+    "node-sass": "^4.12.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.6.0",
+    "prettier": "^1.17.0",
+    "sass": "^1.18.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.5.21"
+  }
+}

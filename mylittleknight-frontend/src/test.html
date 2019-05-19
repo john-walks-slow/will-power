@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="assets/pixi.js"></script>
+    <script src="assets/dragonBones.js"></script>
+    <title>TEST</title>
+  </head>
+  <body>
+    <script>
+      let app;
+      let loader;
+      let resources;
+      let spriteBackground;
+
+      const TEST_MONSTER = 'Bicycle';
+      const ASSET_PATH = 'assets/';
+      // Init the PIXI canvas
+      app = new PIXI.Application();
+      loader = PIXI.loader;
+      resources = loader.resources;
+      document.body.appendChild(app.view);
+      function loadDragonBones(name) {
+        PIXI.loader.add(`${ASSET_PATH}monster/${name}_ske.json`);
+        PIXI.loader.add(`${ASSET_PATH}monster/${name}_tex.json`);
+        PIXI.loader.add(`${ASSET_PATH}monster/${name}_tex.png`);
+      }
+      // Loading monster
+      loadDragonBones(TEST_MONSTER);
+      PIXI.loader.once('complete', onComplete, this);
+      PIXI.loader.load();
+
+      function onComplete(target, resources) {
+        var monsterFactory = new dragonBones.PixiFactory();
+        monsterFactory.parseDragonBonesData(
+          resources[`${ASSET_PATH}monster/${TEST_MONSTER}_ske.json`].data
+        );
+
+        monsterFactory.parseTextureAtlasData(
+          resources[`${ASSET_PATH}monster/${TEST_MONSTER}_tex.json`].data,
+          resources[`${ASSET_PATH}monster/${TEST_MONSTER}_tex.png`].texture
+        );
+        var armatureMonster = monsterFactory.buildArmatureDisplay(
+          resources[`${ASSET_PATH}monster/${TEST_MONSTER}_ske.json`].data
+            .armature[0].name
+        ); //构建骨骼动画
+        armatureMonster.animation.play('bicycle', 0); //执行动画：骑车动作
+        armatureMonster.x = 300;
+        armatureMonster.y = 500;
+        armatureMonster.scale.set(0.3, 0.3);
+        app.stage.addChild(armatureMonster); //添加至舞台
+      }
+      function setup() {
+        // spriteBackground = new PIXI.Sprite(
+        //   resources[`${ASSET_PATH}background/hills_1.png`].texture
+        // );
+        // app.stage.addChild(spriteBackground);
+      }
+    </script>
+  </body>
+</html>
