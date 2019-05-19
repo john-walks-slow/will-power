@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import feathersVuex from 'feathers-vuex';
-import feathersClient from './feathers-client';
 import createPersistedState from 'vuex-persistedstate';
+import feathersClient from '../feathers-client';
+import feathersVuex from 'feathers-vuex';
 
 const { service, auth, FeathersVuex } = feathersVuex(feathersClient, {
   idField: '_id'

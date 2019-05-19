@@ -1,4 +1,4 @@
-const monsters = require('./monster/monsters.service.js');
+const monsters = require('./monsters/monsters.service.js');
 const users = require('./users/users.service.js');
 const gameProgress = require('./game-progress/game-progress.service.js');
 const knights = require('./knights/knights.service.js');

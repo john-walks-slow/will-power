@@ -4,10 +4,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import App from './App.vue';
 import ElementUI from 'element-ui';
 import Vue from 'vue';
-import VueTypedJs from 'vue-typed-js';
 import locale from 'element-ui/lib/locale/lang/en';
 import router from './router';
-import store from './store';
+import store from './store/store';
 
 Vue.config.productionTip = false;
 

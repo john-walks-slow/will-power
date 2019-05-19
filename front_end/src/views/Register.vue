@@ -4,7 +4,7 @@
     <el-form title="Log In" :model="form" :rules="rules" ref="form">
       <el-form-item
         prop="email"
-        :error="errorOnCreate ? 'Use a different email' : ''"
+        :error="errorOnRegister ? 'Use a different email' : ''"
       >
         <el-input
           v-model="form.email"
@@ -28,7 +28,7 @@
       <el-button
         class="button"
         @click="submitRegister()"
-        :loading="isCreatePending"
+        :loading="isRegisterPending"
         >Register</el-button
       >
       <router-link class="linkLogin" to="/login">Go to log in</router-link>
@@ -133,12 +133,12 @@
       }
     },
     computed: {
-      ...mapState('users', ['isCreatePending']),
-      ...mapState('users', ['errorOnCreate'])
+      ...mapState('users', { isRegisterPending: 'isCreatePending' }),
+      ...mapState('users', ['errorOnRegister'])
     },
     watch: {
-      isCreatePending(v, old) {
-        if (v === false && old === true && !this.errorOnCreate) {
+      isRegisterPending(v, old) {
+        if (v === false && old === true && !this.errorOnRegister) {
           this.$router.push('/login');
         }
       }
