@@ -1,4 +1,4 @@
-// Initializes the `gameProgress` service on path `/game-progress`
+// Initializes the `game-progress` service on path `/game-progress`
 const createService = require('feathers-nedb');
 const createModel = require('../../models/game-progress.model');
 const hooks = require('./game-progress.hooks');
