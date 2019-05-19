@@ -1,0 +1,572 @@
+swagger: '2.0'
+
+info:
+  description: 'CSCI 4140 project'
+  version: '1.0.0'
+  title: 'My Little Knight'
+  contact:
+    email: 'john.ren.contact@gmail.com'
+  license:
+    name: 'Apache 2.0'
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: 'localhost'
+basePath: '/v2'
+produces:
+  - 'application/json'
+tags:
+  - name: 'user'
+    description: "Accessing user's profile"
+  - name: 'equipment'
+    description: "Accessing user's equipments"
+  - name: 'material'
+    description: "Accessing user's materials"
+  - name: 'knightGem'
+    description: "Accessing user's knight gems"
+  - name: 'combat'
+    description: "Accessing combat's status"
+
+schemes:
+  - 'https'
+  - 'http'
+
+paths:
+  /user:
+    get:
+      description: "Get authenticated user's profile"
+      operationId: 'getCurrentUser'
+      tags:
+        - user
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+    post:
+      description: "Edit authenticated user's profile"
+      operationId: 'editCurrentUser'
+      tags:
+        - user
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: 'payload'
+          description: Current user's password & Updated user's profile
+          schema:
+            type: object
+            required:
+              - password
+              - profile
+            properties:
+              password:
+                type: string
+              profile:
+                type: object
+
+      responses:
+        201:
+          description: Created
+      security:
+        - APIKeyHeader: []
+
+  /user/{userId}:
+    get:
+      operationId: 'getUser'
+      description: "Get a specific user's profile"
+      tags:
+        - user
+      parameters:
+        - in: 'path'
+          name: 'userId'
+          description: "User's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /user/login:
+    post:
+      operationId: 'login'
+      description: 'Login with username and password'
+      tags:
+        - user
+      parameters:
+        - in: 'body'
+          name: 'payload'
+          description: 'Username & password'
+          schema:
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+  /user/logout:
+    post:
+      operationId: 'logout'
+      description: 'Logout the current user'
+      tags:
+        - user
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /material:
+    get:
+      operationId: 'getMaterials'
+      description: 'Get the materials of the current user'
+      tags:
+        - material
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              materials:
+                type: array
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /material/{materialId}:
+    get:
+      operationId: 'getMaterial'
+      description: "Get a specific material's detail info"
+      tags:
+        - material
+      parameters:
+        - in: 'path'
+          name: 'materialId'
+          description: "Material's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /equipment:
+    get:
+      operationId: 'getEquipments'
+      description: 'Get the equipments of the current user'
+      tags:
+        - equipment
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              materials:
+                type: array
+        default:
+          description: 'unexpected error'
+  /equipment/forge:
+    post:
+      operationId: 'forge'
+      description: 'Forge equipment with materials'
+      tags:
+        - equipment
+      parameters:
+        - in: body
+          name: payload
+          description: Materials used
+          schema:
+            properties:
+              materials:
+                type: array
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /equipment/{equipmentId}:
+    get:
+      operationId: 'getEquipment'
+      description: "Get a specific equipment's detail info"
+      tags:
+        - equipment
+      parameters:
+        - in: 'path'
+          name: 'equipmentId'
+          description: "Equipment's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /equipment/{equipmentId}/seal:
+    post:
+      operationId: 'seal'
+      description: 'Seal specified equipment'
+      tags:
+        - equipment
+      parameters:
+        - in: 'path'
+          name: 'equipmentId'
+          description: "Equipment's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /equipment/{equipmentId}/unseal:
+    post:
+      operationId: 'unseal'
+      description: 'Unseal specified equipment'
+      tags:
+        - equipment
+      parameters:
+        - in: 'path'
+          name: 'equipmentId'
+          description: "Equipment's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /knightGem:
+    get:
+      operationId: 'getknightGems'
+      description: "Get user's knight gems"
+      tags:
+        - knightGem
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              knightGems:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/adventure:
+    post:
+      operationId: 'createAdventure'
+      description: 'Create a new adventure'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'body'
+          name: 'adventureParam'
+          description: 'Params for the adventure to create'
+          schema:
+            required:
+              - name
+              - difficulty
+            properties:
+              name:
+                type: string
+              difficulty:
+                type: number
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/adventure/{adventureId}/start:
+    post:
+      operationId: 'startAdventure'
+      description: 'Start an adventure'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'adventureId'
+          description: "adventure's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /knightGem/adventure/{adventureId}/succeed:
+    post:
+      operationId: 'succeedAdventure'
+      description: 'succeed an adventure'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'adventureId'
+          description: "adventure's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/adventure/{adventureId}/fail:
+    post:
+      operationId: 'failAdventure'
+      description: 'fail an adventure'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'adventureId'
+          description: "adventure's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/evilness:
+    post:
+      operationId: 'createEvilness'
+      description: 'Create a new evilness'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'body'
+          name: 'evilnessParam'
+          description: 'Params for the evilness to create'
+          schema:
+            required:
+              - name
+              - difficulty
+            properties:
+              name:
+                type: string
+              difficulty:
+                type: number
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /knightGem/evilness/{evilnessId}/succeed:
+    post:
+      operationId: 'succeedEvilness'
+      description: 'succeed an evilness'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'evilnessId'
+          description: "evilness's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/evilness/{evilnessId}/fail:
+    post:
+      operationId: 'failEvilness'
+      description: 'fail an evilness'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'evilnessId'
+          description: "evilness's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/heroic:
+    post:
+      operationId: 'createHeroic'
+      description: 'Create a new heroic'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'body'
+          name: 'heroicParam'
+          description: 'Params for the heroic to create'
+          schema:
+            required:
+              - name
+              - difficulty
+            properties:
+              name:
+                type: string
+              difficulty:
+                type: number
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /knightGem/evilness/{heroicId}/succeed:
+    post:
+      operationId: 'succeedHeroic'
+      description: 'succeed an heroic'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'heroicId'
+          description: "heroic's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+  /knightGem/heroic/{heroicId}/fail:
+    post:
+      operationId: 'failHeroic'
+      description: 'fail an heroic'
+      tags:
+        - knightGem
+      parameters:
+        - in: 'path'
+          name: 'heroicId'
+          description: "heroic's Id"
+          type: 'string'
+          required: true
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              result:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+  /combat:
+    get:
+      description: "Get current combat's status"
+      operationId: 'getCombatStatus'
+      tags:
+        - combat
+      responses:
+        200:
+          description: 'aqi response'
+          schema:
+            properties:
+              status:
+                type: object
+        default:
+          description: 'unexpected error'
+      security:
+        - APIKeyHeader: []
+
+securityDefinitions:
+  # X-API-Key: abcdef12345
+  APIKeyHeader:
+    type: apiKey
+    in: header
+    name: X-API-Key
+  basic:
+    type: basic
