@@ -1,4 +1,4 @@
-module.exports = async function joinFind(services, query) {
+module.exports = async function joinFind(services, params) {
   let results = {
     total: 0,
     limit: 0,
@@ -6,7 +6,11 @@ module.exports = async function joinFind(services, query) {
     data: []
   };
   for (let service of services) {
-    let result = await service.find(query);
+    try {
+      var result = await service.find(params);
+    } catch (e) {
+      console.log(e);
+    }
     results.data = [...results.data, ...result.data];
     results.total += result.total;
     results.limit += result.limit;

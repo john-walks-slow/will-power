@@ -5,7 +5,7 @@
         title="EQUIPMENTS"
         :imgSrc="ICON_EQUIPMENT"
         v-if="open"
-        color="#e96268"
+        color="#333333"
         :closePanel="closePanel"
       >
         <div slot="content">
@@ -21,34 +21,29 @@
               ></el-radio-button>
               <el-radio-button
                 class="radioButtonSort"
-                label="By acquired date"
+                label="By acquired time"
+                break
               ></el-radio-button>
             </el-radio-group>
           </div>
           <div class="divEquipments">
             <el-popover
-              v-for="equipment in equipments"
-              :key="equipment.id"
+              v-for="equipment in sortedEquipments"
+              :key="equipment._id"
               placement="top"
               width="100"
               trigger="click"
               class="item"
             >
-              {{ equipment.name }}
-              <div
-                class="divDescription"
-                v-if="equipment.equipmentType == 'weapon'"
-              >
+              {{ equipment.typeId }}
+              <div class="divDescription" v-if="equipment.cat == 'weapon'">
                 Damage: {{ equipment.damage }} <br />
                 WP Cost:
                 {{ equipment.wpConsumption }}
                 <br />
               </div>
 
-              <div
-                class="divDescription"
-                v-if="equipment.equipmentType == 'offHand'"
-              >
+              <div class="divDescription" v-if="equipment.cat == 'offHand'">
                 Max Hp: {{ equipment.maxHp }} <br />
                 Max WP:{{ equipment.maxWp }}
                 <br />
@@ -68,24 +63,30 @@
                   'divEquipmentItem',
                   { rarity1: equipment.rarity === 1 },
                   { rarity2: equipment.rarity === 2 },
-                  { rarity3: equipment.rarity === 3 }
+                  { rarity3: equipment.rarity === 3 },
+                  { rarity4: equipment.rarity === 4 },
+                  { rarity5: equipment.rarity === 5 }
                 ]"
               >
                 <img
-                  :src="ASSETS_EQUIPMENT[`${equipment.type}.png`]"
-                  alt=""
+                  :src="ASSETS_EQUIPMENT[`${equipment.typeId}.png`]"
                   srcset=""
+                  alt=""
                 />
                 <span v-if="equipment.equipped" class="badgeEquipped">E</span>
               </div>
             </el-popover>
           </div>
-          <el-button class="buttonForge" round>
+          <el-button
+            class="buttonForge"
+            round
+            @click="createEquipment({ userId: user._id })"
+          >
             <div class="flexButtonForge">
               Forge New Equipment
               <img class="imgWillGem" :src="WILL_GEM" alt="" srcset="" /><span
                 class="spanGem"
-                >{{ willGem }} / 10</span
+                >10 / {{ willGem }}</span
               >
             </div>
           </el-button>
@@ -108,7 +109,7 @@
         ]"
       >
         <img
-          :src="ASSETS_EQUIPMENT[`${newEquipment.type}.png`]"
+          :src="ASSETS_EQUIPMENT[`${newEquipment.typeId}.png`]"
           alt=""
           srcset=""
         />
@@ -146,7 +147,7 @@
     display: flex;
     /* justify-items: flex-start; */
     flex-wrap: wrap;
-    height: calc(100vh - 420px);
+    height: calc(100vh - 380px);
     overflow-y: scroll;
     justify-content: flex-start;
     align-items: flex-start;
@@ -196,7 +197,13 @@
   }
 
   .divEquipmentItem.rarity3 {
+    border: #db4dff 3px solid;
+  }
+  .divEquipmentItem.rarity4 {
     border: gold 3px solid;
+  }
+  .divEquipmentItem.rarity5 {
+    border: #91fcf6 3px solid;
   }
 
   .divEquipmentItem:hover {
@@ -211,11 +218,17 @@
     image-rendering: pixelated;
   }
   .buttonForge {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    width: 300px;
     display: block;
     margin: auto;
     height: 30px;
     padding: 0px 20px;
-    background-color: #eeeeee;
+    background-color: #000000;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
     border-color: transparent;
   }
   .flexButtonForge {
@@ -223,7 +236,7 @@
     align-content: center;
     align-items: center;
     font-size: 0.8rem;
-    color: black !important;
+    color: white !important;
   }
   .imgWillGem {
     height: 0.8rem;
@@ -242,7 +255,7 @@
   }
   .divNewEquipmentInfo /deep/ div {
     /* margin-left: 100px;
-                                                    margin-top: 10px; */
+                                                                                                                                                                                                                                                                                                                        margin-top: 10px; */
     color: black;
     font-size: 0.8rem !important;
   }
@@ -257,7 +270,9 @@
 <script>
   import Panel from 'components/shared/Panel.vue';
   import { ASSETS_UI, ASSETS_EQUIPMENT } from 'assets';
-  import { CLIENT_RENEG_LIMIT } from 'tls';
+  import { mapState, mapGetters, mapActions } from 'vuex';
+  import { mapFields } from '../../../utils';
+
   export default {
     components: {
       Panel
@@ -269,55 +284,67 @@
       return {
         ICON_EQUIPMENT: ASSETS_UI['IconEquipment.png'],
         WILL_GEM: ASSETS_UI['WillGem.gif'],
-        ASSETS_EQUIPMENT: ASSETS_EQUIPMENT,
+        ASSETS_EQUIPMENT,
         radioSort: 'By rarity',
         dialogVisible: false,
         newEquipment: undefined
       };
     },
     computed: {
-      equipments() {
-        function compare(key, smallFirst) {
-          return function compare(a, b) {
-            if (a[key] < b[key]) {
-              return smallFirst ? -1 : 1;
-            }
-            if (a[key] > b[key]) {
-              return smallFirst ? 1 : -1;
-            }
-            return 0;
-          };
+      ...mapGetters('equipments', { findEquipment: 'find' }),
+      sortedEquipments() {
+        let result;
+        switch (this.radioSort) {
+          case 'By rarity':
+            result = this.findEquipment({
+              query: { $sort: { rarity: -1 } }
+            });
+            break;
+          case 'By acquired time':
+            result = this.findEquipment({
+              query: { $sort: { acquiredTime: 1 } }
+            });
+            break;
+          default:
+            result = null;
+            break;
         }
+        return result.data;
+        // function compare(key, smallFirst) {
+        //   return function compare(a, b) {
+        //     if (a[key] < b[key]) {
+        //       return smallFirst ? -1 : 1;
+        //     }
+        //     if (a[key] > b[key]) {
+        //       return smallFirst ? 1 : -1;
+        //     }
+        //     return 0;
+        //   };
+        // }
 
-        if (this.radioSort === 'By rarity') {
-          return this.$store.state.equipments.sort(compare('rarity', false));
-        } else {
-          return this.$store.state.equipments.sort(
-            compare('acquiredTimestamp', false)
-          );
-        }
+        // if (this.radioSort === 'By rarity') {
+        //   return Object.values(this.equipments).sort(compare('rarity', false));
+        // } else {
+        //   return Object.values(this.equipments).sort(
+        //     compare('acquiredTimestamp', false)
+        //   );
+        // }
       },
-      weapons() {
-        return this.equipments.filter(e => e.equipmentType === 'weapon');
-      },
-
-      offHands() {
-        return this.equipments.filter(e => e.equipmentType === 'offHand');
-      },
-      willGem() {
-        return this.$store.state.gameProgress.willGem;
-      }
+      ...mapState('users', { user: 'copy' }),
+      ...mapGetters('knights', { knight: 'current' }),
+      ...mapFields('knight', ['willGem'])
     },
     methods: {
+      ...mapActions('equipments', { createEquipment: 'create' }),
       closePanel() {
         this.$emit('close');
       },
-      onEquipmentClick(equipment) {},
       openNewEquipmentDialog() {
         this.dialogVisible = true;
       }
     },
     mounted() {
+      console.log(this.ASSETS_EQUIPMENT);
       // this.newEquipment = this.equipments[0];
       // console.log(this.newEquipment);
       // this.openNewEquipmentDialog();

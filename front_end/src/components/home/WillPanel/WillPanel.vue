@@ -59,10 +59,18 @@
         </el-button>
 
         <el-dialog :visible.sync="dialogFormVisible" title="Create a will">
-          <el-form :model="form">
-            <el-form-item label="I am willing to" label-width="100px">
+          <el-form :model="form" :rules="rules" ref="formCreate">
+            <el-form-item
+              label="I am willing to"
+              label-width="110px"
+              prop="name"
+              :error="
+                isCreateError ? 'Something went wrong! Please try again.' : null
+              "
+            >
               <el-input
                 v-model="form.name"
+                :minlength="1"
                 autocomplete="off"
                 placeholder="What are you willing to accomplish?"
               >
@@ -98,7 +106,7 @@
             </el-form-item>
             <el-form-item
               label="At Least"
-              label-width="100px"
+              label-width="110px"
               v-if="form.type === 'commitment'"
             >
               <el-input-number
@@ -152,7 +160,12 @@
           </el-form>
 
           <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="createWill">Create</el-button>
+            <el-button
+              type="primary"
+              @click="submitCreateWill"
+              :loading="isCreateWillPending"
+              >Create</el-button
+            >
             <el-button @click="dialogFormVisible = false">Cancel</el-button>
           </div>
         </el-dialog>
@@ -160,11 +173,19 @@
           :visible.sync="dialogFormEditVisible"
           :title="`Edit ${formEdit.name}`"
         >
-          <el-form :model="formEdit">
-            <el-form-item label="I am willing to" label-width="100px">
+          <el-form :model="formEdit" :rules="rules" ref="formEdit">
+            <el-form-item
+              label="I am willing to"
+              prop="name"
+              label-width="100px"
+              :error="
+                isEditError ? 'Something went wrong! Please try again.' : null
+              "
+            >
               <el-input
                 v-model="formEdit.name"
                 autocomplete="off"
+                :minlength="1"
                 placeholder="What are you willing to accomplish?"
               >
                 <el-select
@@ -172,6 +193,10 @@
                   class="selectType"
                   v-model="formEdit.type"
                   placeholder="Select"
+                  @change="
+                    formEdit.target = undefined;
+                    formEdit.cycle = undefined;
+                  "
                 >
                   <el-option label="Spend time" value="commitment" key="1">
                     <span style="float: left">Spend time</span>
@@ -253,8 +278,15 @@
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="updateWill">Update</el-button>
-            <el-button @click="deleteWill">Delete</el-button>
+            <el-button
+              type="primary"
+              @click="submitPatchWill"
+              :loading="isPatchWillPending"
+              >Update</el-button
+            >
+            <el-button @click="submitRemoveWill" :loading="isRemoveWillPending"
+              >Delete</el-button
+            >
             <el-button @click="dialogFormEditVisible = false">Cancel</el-button>
           </div>
         </el-dialog>
@@ -340,6 +372,7 @@
   import TimerButton from './TimerButton.vue';
   import CounterButton from './CounterButton.vue';
   import MinusButton from './MinusButton.vue';
+  import { mapState, mapActions, mapGetters } from 'vuex';
 
   export default {
     data() {
@@ -348,17 +381,22 @@
         ICON_WILL: ASSETS_UI['IconWill.png'],
         dialogFormVisible: false,
         dialogFormEditVisible: false,
+        isCreateWillPending: false,
+        isPatchWillPending: false,
+        isRemoveWillPending: false,
+        isCreateError: false,
+        isEditError: false,
         form: {
           name: undefined,
           type: 'commitment',
-          target: 0,
+          target: 1,
           cycle: 'day'
         },
-        formEdit: {
-          name: undefined,
-          type: 'commitment',
-          target: 0,
-          cycle: 'day'
+        formEdit: {},
+        rules: {
+          name: [
+            { required: true, message: 'Please enter your will', trigger: 'blur' }
+          ]
         }
       };
     },
@@ -373,14 +411,31 @@
       Panel
     },
     computed: {
+      ...mapState('users', { user: 'copy' }),
+      ...mapState('commitments', {
+        commitments: 'keyedById'
+      }),
+      ...mapState('perseverances', {
+        perseverances: 'keyedById'
+      }),
+      ...mapState('restraints', {
+        restraints: 'keyedById'
+      }),
       activeCommitments() {
-        return this.$store.getters.activeCommitments;
+        console.log(this.commitments);
+        return this.commitments
+          ? Object.values(this.commitments).filter(w => w.active)
+          : [];
       },
       activePerseverances() {
-        return this.$store.getters.activePerseverances;
+        return this.perseverances
+          ? Object.values(this.perseverances).filter(w => w.active)
+          : [];
       },
       activeRestraints() {
-        return this.$store.getters.activeRestraints;
+        return this.restraints
+          ? Object.values(this.restraints).filter(w => w.active)
+          : [];
       },
       empty() {
         return (
@@ -391,15 +446,27 @@
       }
     },
     methods: {
+      ...mapActions('commitments', {
+        createCommitment: 'create',
+        patchCommitment: 'patch',
+        removeCommitment: 'remove'
+      }),
+      ...mapActions('perseverances', {
+        createPerseverance: 'create',
+        patchPerseverance: 'patch',
+        removePerseverance: 'remove'
+      }),
+      ...mapActions('restraints', {
+        createRestraint: 'create',
+        patchRestraint: 'patch',
+        removeRestraint: 'remove'
+      }),
       closePanel() {
         this.$emit('close');
       },
       editWill(will) {
         this.formEdit = {
-          name: will.name,
-          type: will.type,
-          target: will.target,
-          cycle: will.cycle
+          ...will
         };
         this.dialogFormEditVisible = true;
       },
@@ -408,21 +475,99 @@
           name: undefined,
           type: 'commitment',
           target: 0,
-          cycle: 1,
-          target: 1,
-          cycle: 1,
-          target: 0,
-          cycle: 1
+          cycle: 'day',
+          active: true
         };
       },
-      createWill() {
-        this.dialogFormVisible = false;
-        this.resetForm();
+      async submitCreateWill() {
+        this.$refs['formCreate'].validate(async valid => {
+          if (valid) {
+            this.isCreateWillPending = true;
+            try {
+              switch (this.form.type) {
+                case 'commitment':
+                  await this.createCommitment(
+                    Object.assign(this.form, { userId: this.user._id })
+                  );
+                  break;
+                case 'perseverance':
+                  await this.createPerseverance(
+                    Object.assign(this.form, { userId: this.user._id })
+                  );
+                  break;
+                case 'restraint':
+                  await this.createRestraint(
+                    Object.assign(this.form, { userId: this.user._id })
+                  );
+                  break;
+                default:
+                  break;
+              }
+            } catch (e) {
+              this.isCreateError = true;
+            }
+            this.dialogFormVisible = false;
+            this.isCreateWillPending = false;
+            this.resetForm();
+          }
+        });
       },
-      updateWill() {
-        this.dialogFormEditVisible = false;
+      async submitPatchWill() {
+        this.$refs['formEdit'].validate(async valid => {
+          if (valid) {
+            this.isPatchWillPending = true;
+            try {
+              switch (this.formEdit.type) {
+                case 'commitment':
+                  await this.patchCommitment([
+                    this.formEdit._id,
+                    Object.assign(this.formEdit)
+                  ]);
+                  break;
+                case 'perseverance':
+                  await this.patchPerseverance([
+                    this.formEdit._id,
+                    Object.assign(this.formEdit)
+                  ]);
+                  break;
+                case 'restraint':
+                  await this.patchRestraint([
+                    this.formEdit._id,
+                    Object.assign(this.formEdit)
+                  ]);
+                  break;
+                default:
+                  break;
+              }
+            } catch (e) {
+              this.isEditError = true;
+            }
+            this.isPatchWillPending = false;
+            this.dialogFormEditVisible = false;
+          }
+        });
       },
-      deleteWill() {
+
+      async submitRemoveWill() {
+        this.isRemoveWillPending = true;
+        try {
+          switch (this.formEdit.type) {
+            case 'commitment':
+              await this.removeCommitment([this.formEdit._id]);
+              break;
+            case 'perseverance':
+              await this.removePerseverance([this.formEdit._id]);
+              break;
+            case 'restraint':
+              await this.removeRestraint([this.formEdit._id]);
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          this.isEditError = true;
+        }
+        this.isRemoveWillPending = false;
         this.dialogFormEditVisible = false;
       }
     },

@@ -1,8 +1,11 @@
+// NOT USED
+
 // Initializes the `wills` service on path `/wills`
 // const createService = require('feathers-nedb');
 // const createModel = require('../../models/wills.model');
 const hooks = require('./wills.hooks');
 const joinFind = require('../../utils/joinFind');
+
 module.exports = function(app) {
   // const Model = createModel(app);
   // const paginate = app.get('paginate');
@@ -25,10 +28,10 @@ module.exports = function(app) {
     }
   }
   // Initialize our service with any options it requires
-  app.use('/wills', new WillsService());
+  // app.use('/wills', new WillsService());
 
   // Get our initialized service so that we can register hooks
-  const service = app.service('wills');
+  // const service = app.service('wills');
 
-  service.hooks(hooks);
+  // service.hooks(hooks);
 };

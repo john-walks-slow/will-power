@@ -13,22 +13,13 @@
       <span v-if="levelProgress > 10">BOSS </span>
     </span>
 
-    <div>
-      <el-progress
-        class="barMonsterHp"
-        :percentage="Math.round((monsterHp / monsterMaxHp) * 100)"
-        :stroke-width="27"
-        :text-inside="true"
-        color="#a062e9"
-      />
-      <span class="spanBar">{{ monsterHp }}/{{ monsterMaxHp }} HP</span>
-    </div>
+    <Bar class="barMonsterHp" type="monsterHp" :value="hp" :maxValue="maxHp" />
   </div>
 </template>
 <style scoped>
   .buttonBossFight {
     /* position: relative;
-                                                                                                                                                                                                                          bottom: 10px; */
+                                                                                                                                                                                                                                                                                                                                bottom: 10px; */
     border: none;
     background-color: black;
     color: white;
@@ -60,7 +51,7 @@
     font-family: 'silom';
   }
   .barMonsterHp {
-    width: 300px;
+    width: 240px;
     max-width: 40vw;
     margin-top: 10px;
   }
@@ -99,40 +90,21 @@
   }
 </style>
 <script>
-  import { mapGetters, mapActions } from 'vuex';
-
+  import { mapState, mapActions } from 'vuex';
+  import { mapFields } from '../../utils';
+  import Bar from 'components/shared/Bar.vue';
   export default {
+    components: { Bar },
     data() {
       return {
         gameProgress: null
       };
     },
     computed: {
-      ...mapGetters('users', { user: 'current' }),
-      level() {
-        return this.gameProgress ? this.gameProgress.level : 0;
-      },
-      levelProgress() {
-        return this.gameProgress ? this.gameProgress.levelProgress : 0;
-      },
-      monsterHp() {
-        return this.$store.state.monster.hp;
-      },
-      monsterMaxHp() {
-        return this.$store.state.monster.maxHp;
-      }
+      ...mapState('users', { user: 'copy' }),
+      ...mapState('battles', { battle: 'copy' }),
+      ...mapFields('battle', ['hp', 'maxHp', 'level', 'levelProgress'])
     },
-    methods: {
-      ...mapActions('game-progress', { findGameProgress: 'find' })
-    },
-    mounted() {
-      this.findGameProgress({
-        query: {
-          userId: this.user._id
-        }
-      }).then(v => {
-        this.gameProgress = v.data[0];
-      });
-    }
+    mounted() {}
   };
 </script>

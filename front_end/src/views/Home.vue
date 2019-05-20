@@ -1,7 +1,7 @@
 <template>
   <div>
     <DialogView />
-    <LoadingView :progress="loadingProgress" />
+    <LoadingView :progress="loadingProgress" :total="150" />
 
     <KnightStatusView />
     <MenuBar
@@ -15,10 +15,10 @@
       :open="isEquipmentPanelOpen"
       @close="toggleEquipmentPanel"
     />
-    <AchievementPanel
+    <!-- <AchievementPanel
       :open="isAchievementPanelOpen"
       @close="toggleAchievementPanel"
-    />
+    /> -->
     <el-tooltip class="item" effect="dark" content="Attack" placement="top">
       <el-button class="buttonAttack" @click="attack">
         <div>
@@ -27,7 +27,7 @@
       </el-button>
     </el-tooltip>
     <PixiCanvas
-      @loading="updateLoadingProgress"
+      @loading="updatePixiLoadingProgress"
       :knight="knight"
       :monster="monster"
       :scene="scene"
@@ -35,6 +35,11 @@
       :equipmentAnim="equipmentAnim"
     />
     <KnightChooser />
+    <ErrorMessage
+      v-if="isError"
+      :errorMessage="errorMessage"
+      :errorType="errorType"
+    />
   </div>
 </template>
 <style scoped>
@@ -78,6 +83,7 @@
 
 <script>
   import start from 'stories/index.js';
+  import ErrorMessage from 'components/home/ErrorMessage.vue';
   import KnightChooser from 'components/home/KnightChooser.vue';
   import LoadingView from 'components/LoadingView.vue';
   import DialogView from 'components/shared/DialogView.vue';
@@ -106,14 +112,19 @@
       MenuBar,
       KnightChooser,
       GameProgressView,
-      AchievementPanel
+      AchievementPanel,
+      ErrorMessage
     },
     data() {
       return {
-        loadingProgress: 0,
+        pixiLoadingProgress: 0,
+        apiLoadingProgress: 0,
         isWillPanelOpen: false,
         isEquipmentPanelOpen: false,
         isAchievementPanelOpen: false,
+        isError: false,
+        errorMessage: '',
+        errorType: '',
         ICON_ATTACK: ASSETS_UI['IconAttack.png']
       };
     },
@@ -137,14 +148,14 @@
       equipmentAnim() {
         return 'AttackMeleeHeavy';
       },
-      ...mapState('auth', {
-        isLoginSucceed: state => state.auth.user
-      }),
-      ...mapActions('auth', ['authenticate'])
+      loadingProgress() {
+        return this.pixiLoadingProgress + this.apiLoadingProgress;
+      },
+      ...mapState('auth', ['accessToken', 'user'])
     },
     methods: {
-      updateLoadingProgress(progress) {
-        this.loadingProgress = Math.round(progress);
+      updatePixiLoadingProgress(progress) {
+        this.pixiLoadingProgress = Math.round(progress);
       },
       toggleWillPanel() {
         this.isWillPanelOpen = !this.isWillPanelOpen;
@@ -175,12 +186,44 @@
       },
       attack() {
         busPixi.$emit('knightAttack', 'attackMeleeHeavy');
-      }
+      },
+      ...mapActions('auth', ['authenticate']),
+      ...mapActions('commitments', { findCommitments: 'find' }),
+      ...mapActions('perseverances', { findPerseverances: 'find' }),
+      ...mapActions('restraints', { findRestraints: 'find' }),
+      ...mapActions('equipments', { findEquipments: 'find' }),
+      ...mapActions('knights', { getKnight: 'get' }),
+      ...mapActions('battles', { getBattle: 'get' })
     },
-    mounted() {
-      if (!this.isLoginSucceed) {
+    async mounted() {
+      this.$on('error', e => {
+        this.isError = true;
+        this.errorMessage = e.errorMessage;
+        this.errorType = e.errorType;
+      });
+      if (!this.accessToken && !window.localStorage.getItem('feathers-jwt')) {
         this.$router.push('/login');
       }
+      try {
+        await this.authenticate();
+      } catch (e) {
+        this.$emit('error', {
+          errorMessage: e.message,
+          errorType: 'authenticate'
+        });
+      }
+      try {
+        await this.findCommitments({ query: { userId: this.user._id } });
+        await this.findPerseverances({ query: { userId: this.user._id } });
+        await this.findRestraints({ query: { userId: this.user._id } });
+        await this.getKnight(this.user._id);
+        await this.getBattle(this.user._id);
+        await this.findEquipments({ query: { userId: this.user._id } });
+      } catch (e) {
+        this.$emit('error', { errorMessage: e.message, errorType: 'network' });
+        return;
+      }
+      this.apiLoadingProgress += 50;
     }
   };
 </script>

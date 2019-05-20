@@ -30,7 +30,7 @@
   const GROUND_HEIGHT = 800;
   const SCREEN_HEIGHT = screen.height;
   const SCREEN_WIDTH = screen.width;
-  const WORLD_HEIGHT = 1800;
+  const WORLD_HEIGHT = 1400;
   const WORLD_WIDTH = 4000;
 
   const CAMERA_STATE_MENU = 0;
@@ -226,12 +226,12 @@
       let orgCamera;
       busPixi.$on('knightAttack', () => {
         animating = true;
-        viewport.snap(displayKnight.x, WORLD_HEIGHT - GROUND_HEIGHT - 100, {
-          removeOnComplete: true
-        });
-        viewport.snapZoom({
-          height: (WORLD_HEIGHT / 3 / window.innerHeight) * SCREEN_HEIGHT
-        });
+        // viewport.snap(displayKnight.x, WORLD_HEIGHT - GROUND_HEIGHT - 100, {
+        //   removeOnComplete: true
+        // });
+        // viewport.snapZoom({
+        //   height: (WORLD_HEIGHT / 3 / window.innerHeight) * SCREEN_HEIGHT
+        // });
         setTimeout(() => {
           displayKnight.animation.play(this.equipmentAnim, 1);
         }, 200);
@@ -326,7 +326,7 @@
     spriteBackground = new PIXI.TilingSprite(
       resources[`Background${scene}`].texture,
       WORLD_WIDTH,
-      WORLD_HEIGHT
+      WORLD_HEIGHT - GROUND_HEIGHT + 10
     );
     spriteBackground.tileScale.set(
       ((WORLD_HEIGHT + 200 - GROUND_HEIGHT) /
@@ -337,7 +337,7 @@
         1
     );
     spriteBackground.x = 0;
-    spriteBackground.y = -50;
+    spriteBackground.y = -10;
     spriteBackground.zIndex = 1;
     viewport.addChild(spriteBackground);
     spriteGrass = new PIXI.TilingSprite(
@@ -448,8 +448,8 @@
   let count = 0;
   function swing() {
     count += 0.01;
-    const x = (Math.cos(count) * (1 + Math.random())) / 8;
-    const y = (Math.sin(count) * (1 + Math.random())) / 10;
+    const x = (Math.cos(count) * (1 + Math.random())) / 15;
+    const y = (Math.sin(count) * (1 + Math.random())) / 18;
     viewport.moveCenter({
       x: viewport.center.x + x,
       y: viewport.center.y + y

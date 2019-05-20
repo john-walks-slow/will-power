@@ -7,6 +7,5 @@ module.exports = function(app) {
     filename: path.join(dbPath, 'knights.db'),
     autoload: true
   });
-
   return Model;
 };

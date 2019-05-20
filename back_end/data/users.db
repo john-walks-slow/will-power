@@ -1,5 +1,2 @@
-{"email":"jon.ren.conc@gsma.com","password":"$2a$13$4HjBWzCHCqKaBkaoZVNaHeNQnMyF.7KyLdk5m0sTwffLTxVTcaUKa","_id":"3Tjk3YADxEbEAWtW"}
-{"email":"test@test.com","password":"$2a$13$LVxVXqlbofwQPy.UIRmJ4OUkYZLo0s5FCMXMiwr1Ak8GkLPO6/fvy","_id":"4OKJJzaQjJcyNx22"}
-{"email":"jon.ren.conc@gsmsda.com","password":"$2a$13$fkxwUQ3RrNI6JFMGlxQPZegIBgnCoMFtMQdL8V2XCkUD6Gwqz.bEi","_id":"OjPOv9Dv5ZgNRRVV"}
-{"email":"jon.ren.conc@gma.com","password":"$2a$13$6DtD34kHNdO2aDWQVSl9Ye5fvsiYWyRWm9yDOmbPnmn0rJGhUNwgi","_id":"aRE2pGWFSTjtZviU"}
+{"strategy":"local","email":"test@test.com","password":"$2a$13$J8PlV05bqT10HHqILZUxLeZ5PetTokWY4hDyG3.D1j7dRpUncvtLe","_id":"test"}
 {"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}

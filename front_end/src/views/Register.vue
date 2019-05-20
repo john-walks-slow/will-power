@@ -4,7 +4,11 @@
     <el-form title="Log In" :model="form" :rules="rules" ref="form">
       <el-form-item
         prop="email"
-        :error="errorOnRegister ? 'Use a different email' : ''"
+        :error="
+          errorOnRegister.errorType === 'uniqueViolated'
+            ? 'Use a different email'
+            : ''
+        "
       >
         <el-input
           v-model="form.email"
@@ -23,13 +27,14 @@
           show-password
           v-model="form.password2"
           placeholder="Enter your password again"
+          @keyup.enter.native="submitRegister"
         ></el-input>
       </el-form-item>
       <el-button
         class="button"
-        @click="submitRegister()"
+        @click="submitRegister"
         :loading="isRegisterPending"
-        >Register</el-button
+        >Create</el-button
       >
       <router-link class="linkLogin" to="/login">Go to log in</router-link>
     </el-form>
@@ -77,6 +82,7 @@
       };
       return {
         LOGO: ASSETS_UI['logo.png'],
+        errorOnRegister: false,
         form: {
           email: '',
           password: '',
@@ -91,8 +97,8 @@
               trigger: 'blur'
             },
             {
-              min: 8,
-              message: 'Password has to contains more than 8 characters',
+              min: 4,
+              message: 'Password has to contains more than 4 characters',
               trigger: 'blur'
             }
           ],
@@ -116,12 +122,17 @@
       ...mapActions('users', { register: 'create' }),
       submitRegister() {
         console.log('reg');
-        this.$refs['form'].validate(valid => {
+        this.$refs['form'].validate(async valid => {
           if (valid) {
-            this.register({
-              email: this.form.email,
-              password: this.form.password
-            });
+            try {
+              await this.register({
+                email: this.form.email,
+                password: this.form.password
+              });
+            } catch (e) {
+              console.log(this.$store.state.users.errorOnCreate);
+              this.errorOnRegister = this.$store.state.users.errorOnCreate;
+            }
           } else {
             console.log('error submit!!');
             return false;
@@ -133,15 +144,9 @@
       }
     },
     computed: {
-      ...mapState('users', { isRegisterPending: 'isCreatePending' }),
-      ...mapState('users', ['errorOnRegister'])
-    },
-    watch: {
-      isRegisterPending(v, old) {
-        if (v === false && old === true && !this.errorOnRegister) {
-          this.$router.push('/login');
-        }
-      }
+      ...mapState('users', {
+        isRegisterPending: 'isCreatePending'
+      })
     }
   };
 </script>

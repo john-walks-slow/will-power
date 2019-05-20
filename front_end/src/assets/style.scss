@@ -1,3 +1,8 @@
+$--color-primary: #62e9e3;
+$--color-secondary: #e96268;
+$--color-alert: #e37dfd;
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+
 @font-face {
   font-family: 'Minecraft';
   src: url('Minecraft.ttf');
@@ -41,15 +46,14 @@
   transform: scale(0.5);
   opacity: 0;
 }
-/* 改变主题色变量 */
-$--color-primary: #f72e54;
-$--color-secondary: #22d2a2;
-$--color-alert: #ffce25;
+
 h1,
 h2,
 p,
-b {
-  pointer-events: none;
+b,
+span {
+  // pointer-events: none;
+  user-select: none; /* Standard */
 }
 .el-button:focus,
 .el-button:hover {
@@ -66,6 +70,7 @@ button:active {
 html {
   font-size: 1.1rem;
 }
-.el-dialog{
+.el-dialog {
   z-index: 99999;
 }
+@import '~element-ui/packages/theme-chalk/src/index';

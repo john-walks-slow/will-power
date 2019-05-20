@@ -25,3 +25,15 @@ export const ALL_COMPONENTS = importAllWithoutPath(
 for (var entry in ALL_COMPONENTS) {
   ALL_COMPONENTS[entry] = ALL_COMPONENTS[entry].default;
 }
+
+export function mapFields(object, fields) {
+  let result = {};
+  for (let field of fields) {
+    {
+      result[field] = function() {
+        return this[object] ? this[object][field] : undefined;
+      };
+    }
+  }
+  return result;
+}

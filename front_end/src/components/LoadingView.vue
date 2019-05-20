@@ -7,7 +7,7 @@
           color="#b0f4f1"
           :show-text="false"
           :stroke-width="5"
-          :percentage="progress"
+          :percentage="(progress / total) * 100"
         ></el-progress>
       </div>
     </el-container>
@@ -43,7 +43,8 @@
   import { ASSETS_UI } from 'assets';
   export default {
     props: {
-      progress: Number
+      progress: Number,
+      total: Number
     },
     data() {
       return {
@@ -53,11 +54,11 @@
     },
     watch: {
       progress(val) {
-        if (val === 100) {
+        if (val === this.total) {
           setTimeout(() => {
             console.log('test');
             this.show = false;
-          }, 1500);
+          }, 1000);
         }
       }
     }

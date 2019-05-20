@@ -24,21 +24,25 @@ module.exports = {
     find: [],
     get: [],
     create: [
-      // function initUserData(context) {
-      //   context.app.service('/knights').create({
-      //     userId: context.result._id,
-      //     hp: 50,
-      //     wp: 50,
-      //     appearance: 'KnightMale'
-      //   });
-      //   context.app.service('/game-progress').create({
-      //     userId: context.result._id,
-      //     level: 1,
-      //     levelProgress: 0,
-      //     willGem: 0
-      //   });
-      //   context.app.service('/game-progress').nextLevel();
-      // }
+      async function initUserData(context) {
+        context.app.service('/users').emit('initStart');
+        await context.app.service('/knights').create({
+          _id: context.result._id,
+          hp: 50,
+          wp: 50,
+          appearance: 'KnightMale',
+          willGem: 0
+        });
+        await context.app.service('/battles').create({
+          _id: context.result._id,
+          level: 1,
+          levelProgress: 1,
+          monsterTypeId: 'test',
+          hp: 30
+        });
+        context.app.service('/users').emit('initComplete');
+        // context.app.service('/game-progress').nextLevel();
+      }
     ],
     update: [],
     patch: [],

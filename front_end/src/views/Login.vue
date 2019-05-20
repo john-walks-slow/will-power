@@ -13,9 +13,12 @@
           show-password
           v-model="form.password"
           placeholder="Enter your password"
+          @keyup.enter.native="submitLogin"
         ></el-input>
       </el-form-item>
-      <el-button class="button" @click="login()">Log In</el-button>
+      <el-button class="button" @click="submitLogin" :loading="isLoginPending"
+        >Log In</el-button
+      >
       <router-link class="linkRegister" to="/register">Register</router-link>
     </el-form>
   </div>
@@ -66,8 +69,8 @@
               trigger: 'blur'
             },
             {
-              min: 8,
-              message: 'Password has to contains more than 8 characters',
+              min: 4,
+              message: 'Password has to contains more than 4 characters',
               trigger: 'blur'
             }
           ],
@@ -87,19 +90,20 @@
       };
     },
     methods: {
-      login() {
-        this.$refs['form'].validate(valid => {
+      async submitLogin() {
+        await this.logout();
+        this.$refs['form'].validate(async valid => {
           if (valid) {
             console.log(this.authenticate);
-
-            this.authenticate({
+            let result = await this.authenticate({
               strategy: 'local',
               email: this.form.email,
               password: this.form.password
             });
+            if (result.accessToken) {
+              this.$router.push('/');
+            }
           } else {
-            console.log(this.authenticate);
-
             return false;
           }
         });
@@ -107,21 +111,16 @@
       resetForm(formName) {
         this.$refs[formName].resetFields();
       },
-      ...mapActions('auth', ['authenticate'])
+      ...mapActions('auth', ['authenticate', 'logout'])
     },
     computed: {
       ...mapState('auth', {
-        isLoginSucceed: state => state.accessToken,
-        isLoginError: state => state.errorOnAuthenticate
+        isLoginError: 'errorOnAuthenticate',
+        isLoginPending: 'isAuthenticatePending',
+        user: 'user'
       })
     },
-    watch: {
-      isLoginSucceed(isLoginSucceed) {
-        if (isLoginSucceed) {
-          this.$router.push('/');
-        }
-      }
-    },
+
     mounted() {}
   };
 </script>
