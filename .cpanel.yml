@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/user/server/
+    - export PUBLICPATH=/home/user/server/public
+    - /bin/cp -R back_end $DEPLOYPATH
+    - cd front_end
+    - npm run build
+    - /bin/cp -R build $PUBLICPATH
+    - cd DEPLOYPATH
+    - cd npm start
