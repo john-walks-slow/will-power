@@ -1,6 +1,0 @@
-{"email":"test@test.com","password":"$2a$13$9DEeLTspGGfO79RboqzAF.o3ZiP6GptyQLl49wb/IPywTyOC0sPEi","_id":"28TJjQKT3dFjxU4K"}
-{"email":"a@b.com","password":"$2a$13$bai5PmWlicljKDLzu5qFRezniA/bXPXU.qObY00YqeVCNNmAQ3l4y","_id":"J6znu8kc412Mx2y7"}
-{"email":"a@a.com","password":"$2a$13$G2sU02ZJlx1EF.E1QAgzweJ.tXz7enpEc5KvFvPzjGWeUDX6lDKda","_id":"JMu2LH8hm3iQuj6u"}
-{"email":"2@b.com","password":"$2a$13$1OieGKZWBZ63u5VyFL9iZu6VqGj/scixuALpFxHapdU45omVGY4v2","_id":"W9TFtv3721dcqWTz"}
-{"email":"john.ren.contact@gmail.com","password":"$2a$13$OibXUMuq7zsRvoq.sqerRugx6QrR9u62ikzfLuw7bcnx5.OGuhJ.q","_id":"o3DEO1BDwEoQ4MYF"}
-{"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}
