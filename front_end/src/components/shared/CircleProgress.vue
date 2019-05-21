@@ -8,13 +8,7 @@
     type="circle"
     :stroke-width="8"
     :percentage="
-      total > 0
-        ? progress >= 0
-          ? progress > total
-            ? 100
-            : (progress / total) * 100
-          : 100
-        : 0
+      progress >= 0 ? (progress > total ? 100 : (progress / total) * 100) : 100
     "
     :width="size"
   ></el-progress>

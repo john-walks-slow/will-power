@@ -1,1 +1,57 @@
-{"_id":"test","maxHp":30,"damage":20}
+{"name":"Ancient Automaton","_id":"AncientAutomaton","damage":34,"maxHp":34}
+{"name":"Arcane Golem","_id":"ArcaneGolem","damage":26,"maxHp":25}
+{"name":"Black Ant Queen","_id":"BlackAntQueen","damage":22,"maxHp":36}
+{"name":"Bonemask Shadow Creature","_id":"BonemaskShadowCreature","damage":22,"maxHp":33}
+{"name":"Clockwork King","_id":"ClockworkKing","damage":25,"maxHp":33}
+{"name":"Clockwork Mage","_id":"ClockworkMage","damage":34,"maxHp":39}
+{"name":"Clockworkprototype","_id":"Clockworkprototype","damage":27,"maxHp":33}
+{"name":"Clockwork Skull","_id":"ClockworkSkull","damage":34,"maxHp":26}
+{"name":"Colossal Crow","_id":"ColossalCrow","damage":39,"maxHp":20}
+{"name":"Continental Turtle Rukkha","_id":"ContinentalTurtleRukkha","damage":34,"maxHp":34}
+{"name":"Crab King Karkinos","_id":"CrabKingKarkinos","damage":28,"maxHp":36}
+{"name":"Cultist Mage","_id":"CultistMage","damage":34,"maxHp":21}
+{"name":"Daidarabotchi","_id":"Daidarabotchi","damage":29,"maxHp":23}
+{"name":"Darkness Titan Ilnoct","_id":"DarknessTitanIlnoct","damage":22,"maxHp":30}
+{"name":"Dark Queen Shaccad Yoggoth","_id":"DarkQueenShaccadYoggoth","damage":35,"maxHp":26}
+{"name":"Dragon Huanglong","_id":"DragonHuanglong","damage":32,"maxHp":24}
+{"name":"Drill Dwarf","_id":"DrillDwarf","damage":33,"maxHp":21}
+{"name":"Dryad Queen Rafflesia","_id":"DryadQueenRafflesia","damage":20,"maxHp":23}
+{"name":"Dryad Yggdrasil","_id":"DryadYggdrasil","damage":22,"maxHp":22}
+{"name":"Eldritch Overmind","_id":"EldritchOvermind","damage":30,"maxHp":37}
+{"name":"Giant Kitsune","_id":"GiantKitsune","damage":22,"maxHp":21}
+{"name":"Goddess Aphrodite","_id":"GoddessAphrodite","damage":27,"maxHp":23}
+{"name":"God Warrior Isis","_id":"GodWarriorIsis","damage":21,"maxHp":39}
+{"name":"God Warrior Osiris","_id":"GodWarriorOsiris","damage":21,"maxHp":33}
+{"name":"God Warrior Skoll","_id":"GodWarriorSkoll","damage":34,"maxHp":24}
+{"name":"Grand Sorceress Duesa","_id":"GrandSorceressDuesa","damage":35,"maxHp":36}
+{"name":"Hellhound Garm","_id":"HellhoundGarm","damage":24,"maxHp":22}
+{"name":"Ice Titan Demeres","_id":"IceTitanDemeres","damage":34,"maxHp":32}
+{"name":"Insect Queen","_id":"InsectQueen","damage":25,"maxHp":32}
+{"name":"Jubokko","_id":"Jubokko","damage":26,"maxHp":34}
+{"name":"King Archial","_id":"KingArchial","damage":39,"maxHp":26}
+{"name":"Light Titan Alfadriel","_id":"LightTitanAlfadriel","damage":28,"maxHp":38}
+{"name":"Living Hoard Midas","_id":"LivingHoardMidas","damage":31,"maxHp":36}
+{"name":"Mecha Rattlesnake","_id":"MechaRattlesnake","damage":39,"maxHp":31}
+{"name":"Mecha Scorpion","_id":"MechaScorpion","damage":36,"maxHp":35}
+{"name":"Mermaid Warrior Undeen","_id":"MermaidWarriorUndeen","damage":26,"maxHp":30}
+{"name":"Orc Chief Grunt","_id":"OrcChiefGrunt","damage":28,"maxHp":28}
+{"name":"Parrot King","_id":"ParrotKing","damage":32,"maxHp":33}
+{"name":"Poseidon","_id":"Poseidon","damage":31,"maxHp":36}
+{"name":"Radulac The Voidvod","_id":"RadulacTheVoidvod","damage":32,"maxHp":29}
+{"name":"Runic Stone Golem Goliath","_id":"RunicStoneGolemGoliath","damage":26,"maxHp":22}
+{"name":"Sea Calamity Urmica","_id":"SeaCalamityUrmica","damage":30,"maxHp":30}
+{"name":"Sea Dragon Leviathan","_id":"SeaDragonLeviathan","damage":20,"maxHp":33}
+{"name":"Shaccad Yoggoth","_id":"ShaccadYoggoth","damage":25,"maxHp":29}
+{"name":"Slime Flynn","_id":"SlimeFlynn","damage":35,"maxHp":29}
+{"name":"Son Of Valhalla","_id":"SonOfValhalla","damage":39,"maxHp":35}
+{"name":"Spirit Fighter","_id":"SpiritFighter","damage":31,"maxHp":34}
+{"name":"Tantalus","_id":"Tantalus","damage":30,"maxHp":36}
+{"name":"Thanatos","_id":"Thanatos","damage":31,"maxHp":31}
+{"name":"The Fallen","_id":"TheFallen","damage":38,"maxHp":31}
+{"name":"The Horde","_id":"TheHorde","damage":26,"maxHp":22}
+{"name":"Thunder Titan Dynamo","_id":"ThunderTitanDynamo","damage":24,"maxHp":30}
+{"name":"Tiamat","_id":"Tiamat","damage":29,"maxHp":22}
+{"name":"Tiamat Unleashed","_id":"TiamatUnleashed","damage":32,"maxHp":23}
+{"name":"Zeograth","_id":"Zeograth","damage":27,"maxHp":40}
+{"name":"Zodiac Aries","_id":"ZodiacAries","damage":34,"maxHp":36}
+{"name":"Zodiac Cancer","_id":"ZodiacCancer","damage":36,"maxHp":35}

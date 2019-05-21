@@ -17,17 +17,17 @@ module.exports = function(app) {
       return await this._patch(id, data, params);
     }
     let { action } = params.query;
-    let userId = await this._get(id).userId;
+    let currentRestraint = await this._get(id);
     switch (action) {
     case 'fail':
-      await app.service('knights').patchWp(userId, {
-        willType: 'restraint'
-      });
+      data = {
+        progress: currentRestraint.progress + 1
+      };
       break;
     default:
       break;
     }
-    return await this._patch(id, data);
+    return await this._patch(id, data, {});
   };
   // Initialize our service with any options it requires
   app.use('/wills/restraints', service);

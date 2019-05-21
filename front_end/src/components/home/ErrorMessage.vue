@@ -5,7 +5,7 @@
     width="300px"
   >
     <span v-if="errorType === 'network'"
-      >{{ errorMessage + '\n' }}Please refresh the page.
+      >{{ errorMessage + '\n' }}Please check your network and refresh the page.
     </span>
     <span v-if="errorType === 'authenticate'">Please login again. </span>
     <span slot="footer" class="dialog-footer">

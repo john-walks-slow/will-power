@@ -83,6 +83,7 @@
 
 <script>
   import start from 'stories/index.js';
+  import Vue from 'vue';
   import ErrorMessage from 'components/home/ErrorMessage.vue';
   import KnightChooser from 'components/home/KnightChooser.vue';
   import LoadingView from 'components/LoadingView.vue';
@@ -100,6 +101,7 @@
 
   import { ASSETS_UI } from 'assets';
   import { mapState, mapActions } from 'vuex';
+  export const busError = new Vue();
   export default {
     name: 'home',
     components: {
@@ -186,41 +188,48 @@
       },
       attack() {
         busPixi.$emit('knightAttack', 'attackMeleeHeavy');
+        this.patchKnight([this.user._id, {}, { query: { action: 'attack' } }]);
       },
       ...mapActions('auth', ['authenticate']),
       ...mapActions('commitments', { findCommitments: 'find' }),
       ...mapActions('perseverances', { findPerseverances: 'find' }),
       ...mapActions('restraints', { findRestraints: 'find' }),
       ...mapActions('equipments', { findEquipments: 'find' }),
-      ...mapActions('knights', { getKnight: 'get' }),
+      ...mapActions('knights', { getKnight: 'get', patchKnight: 'patch' }),
       ...mapActions('battles', { getBattle: 'get' })
     },
     async mounted() {
-      this.$on('error', e => {
+      busError.$on('error', e => {
         this.isError = true;
-        this.errorMessage = e.errorMessage;
-        this.errorType = e.errorType;
+        // this.errorMessage = e.errorMessage;
+        this.errorType = e.message;
       });
-      if (!this.accessToken && !window.localStorage.getItem('feathers-jwt')) {
-        this.$router.push('/login');
-      }
       try {
-        await this.authenticate();
+        if (!this.accessToken && !window.localStorage.getItem('feathers-jwt')) {
+          this.$router.push('/login');
+        }
+        try {
+          let result = await this.authenticate();
+          console.log('auth' + result);
+        } catch (e) {
+          if (e.message.includes('timed out')) {
+            throw new Error('network');
+          } else {
+            throw new Error('authenticate');
+          }
+        }
+        try {
+          await this.findCommitments({ query: { userId: this.user._id } });
+          await this.findPerseverances({ query: { userId: this.user._id } });
+          await this.findRestraints({ query: { userId: this.user._id } });
+          await this.getKnight(this.user._id);
+          await this.getBattle(this.user._id);
+          await this.findEquipments({ query: { userId: this.user._id } });
+        } catch (e) {
+          throw new Error('network');
+        }
       } catch (e) {
-        this.$emit('error', {
-          errorMessage: e.message,
-          errorType: 'authenticate'
-        });
-      }
-      try {
-        await this.findCommitments({ query: { userId: this.user._id } });
-        await this.findPerseverances({ query: { userId: this.user._id } });
-        await this.findRestraints({ query: { userId: this.user._id } });
-        await this.getKnight(this.user._id);
-        await this.getBattle(this.user._id);
-        await this.findEquipments({ query: { userId: this.user._id } });
-      } catch (e) {
-        this.$emit('error', { errorMessage: e.message, errorType: 'network' });
+        busError.$emit('error', e);
         return;
       }
       this.apiLoadingProgress += 50;

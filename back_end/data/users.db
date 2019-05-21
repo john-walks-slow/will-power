@@ -1,2 +1,3 @@
-{"strategy":"local","email":"test@test.com","password":"$2a$13$J8PlV05bqT10HHqILZUxLeZ5PetTokWY4hDyG3.D1j7dRpUncvtLe","_id":"test"}
+{"email":"john.ren.contact@gmail.com","password":"$2a$13$QzsdJZJjF1K.uQ4/Irlu4egVVHZh6z4Gpu2qPAdauzANMpudHrrXy","_id":"c1NHDHjY4KAqwtZv"}
+{"email":"test@test.com","password":"$2a$13$zuQ1mvCXsefsfVgitkpl.u4CAr14qeDjhywDtxeC1mmYo8dshesuy","_id":"uFKvptvhkWkmkO0X"}
 {"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}

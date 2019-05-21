@@ -17,22 +17,36 @@ module.exports = function(app) {
       return await this._patch(id, data, params);
     }
     let { action } = params.query;
-    let userId = await this._get(id).userId;
+    let currentCommitment = await this._get(id);
     let currentTime = new Date().getTime();
     switch (action) {
     case 'start':
       data.lastCommitmentStartTime = currentTime;
       break;
     case 'complete':
-      await app.service('knights').patchWp(userId, {
-        willType: 'commitment',
-        progress: currentTime - data.lastCommitmentStartTime
+      var knight = await app.service('knights').get(currentCommitment.userId);
+      await app.service('knights')._patchDelta(currentCommitment.userId, {
+        field: 'wp',
+        max: knight.maxWp,
+        delta: Math.floor(
+          (currentTime - currentCommitment.lastCommitmentStartTime) / 100000
+        ),
+        stayOriginal: false,
+        notify: true
       });
+      data = {
+        progress:
+            currentCommitment.progress +
+            Math.floor(
+              (currentTime - currentCommitment.lastCommitmentStartTime) / 60000
+            ),
+        lastCommitmentStartTime: null
+      };
       break;
     default:
       break;
     }
-    return await this._patch(id, data);
+    return await this._patch(id, data, {});
   };
   // Initialize our service with any options it requires
   app.use('/wills/commitments', service);

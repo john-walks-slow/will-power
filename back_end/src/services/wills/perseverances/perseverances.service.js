@@ -17,17 +17,29 @@ module.exports = function(app) {
       return await this._patch(id, data, params);
     }
     let { action } = params.query;
-    let userId = await this._get(id).userId;
+    let currentPerseverance = await this._get(id);
+    var knight = await app.service('knights').get(currentPerseverance.userId);
+
     switch (action) {
     case 'complete':
-      await app.service('knights').patchWp(userId, {
-        willType: 'perseverance'
+      await app.service('knights')._patchDelta(currentPerseverance.userId, {
+        field: 'wp',
+        max: knight.maxWp,
+        delta: Math.floor(
+          (currentPerseverance.progress < currentPerseverance.target
+            ? (1 / currentPerseverance.target) *
+                (currentPerseverance.cycle === 'day' ? 1 : 2)
+            : 0) * 50
+        ),
+        stayOriginal: false,
+        notify: true
       });
+      data = { progress: currentPerseverance.progress + 1 };
       break;
     default:
       break;
     }
-    return await this._patch(id, data);
+    return await this._patch(id, data, {});
   };
   // Initialize our service with any options it requires
   app.use('/wills/perseverances', service);

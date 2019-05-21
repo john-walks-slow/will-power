@@ -5,7 +5,7 @@
         title="EQUIPMENTS"
         :imgSrc="ICON_EQUIPMENT"
         v-if="open"
-        color="#333333"
+        color="#e96268"
         :closePanel="closePanel"
       >
         <div slot="content">
@@ -35,7 +35,9 @@
               trigger="click"
               class="item"
             >
-              {{ equipment.typeId }}
+              {{
+                equipment.typeId.replace(/[a-z][A-Z]/, c => c[0] + ' ' + c[1])
+              }}
               <div class="divDescription" v-if="equipment.cat == 'weapon'">
                 Damage: {{ equipment.damage }} <br />
                 WP Cost:
@@ -48,16 +50,37 @@
                 Max WP:{{ equipment.maxWp }}
                 <br />
               </div>
-              <el-button v-if="!equipment.equipped" size="mini" type="text"
+              <el-button
+                v-if="!equipment.equipped"
+                size="mini"
+                type="text"
+                @click="
+                  equipment.infoOpen = false;
+                  equip(equipment._id);
+                "
                 >Equip</el-button
               >
-              <el-button v-if="equipment.equipped" size="mini" type="text"
+              <el-button
+                v-if="equipment.equipped"
+                size="mini"
+                type="text"
+                @click="
+                  equipment.infoOpen = false;
+                  unequip(equipment._id);
+                "
                 >Unequip</el-button
               >
-              <el-button size="mini" type="text">Decompose</el-button>
+              <el-button
+                size="mini"
+                type="text"
+                @click="
+                  equipment.infoOpen = false;
+                  removeEquipment(equipment._id);
+                "
+                >Decompose</el-button
+              >
 
               <div
-                @click="onEquipmentClick(equipment)"
                 slot="reference"
                 :class="[
                   'divEquipmentItem',
@@ -80,13 +103,15 @@
           <el-button
             class="buttonForge"
             round
+            :disabled="willGem < 100"
             @click="createEquipment({ userId: user._id })"
           >
             <div class="flexButtonForge">
               Forge New Equipment
               <img class="imgWillGem" :src="WILL_GEM" alt="" srcset="" /><span
                 class="spanGem"
-                >10 / {{ willGem }}</span
+                :class="{ notEnough: willGem < 100 }"
+                >100 / {{ willGem }}</span
               >
             </div>
           </el-button>
@@ -180,7 +205,7 @@
     transition: all 150ms;
   }
   .divEquipmentItem {
-    background-color: #dfdfdf;
+    background-color: #efefef;
     border-radius: 10px;
     width: 50px;
     height: 50px;
@@ -227,7 +252,7 @@
     margin: auto;
     height: 30px;
     padding: 0px 20px;
-    background-color: #000000;
+    background-color: #000000 !important;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
     border-color: transparent;
   }
@@ -246,6 +271,10 @@
   .spanGem {
     font-size: 12px;
   }
+  .spanGem.notEnough {
+    font-size: 12px;
+    color: #db4dff;
+  }
   .badgeEquipped {
     position: relative;
     font-size: 10px;
@@ -255,7 +284,7 @@
   }
   .divNewEquipmentInfo /deep/ div {
     /* margin-left: 100px;
-                                                                                                                                                                                                                                                                                                                        margin-top: 10px; */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    margin-top: 10px; */
     color: black;
     font-size: 0.8rem !important;
   }
@@ -287,7 +316,8 @@
         ASSETS_EQUIPMENT,
         radioSort: 'By rarity',
         dialogVisible: false,
-        newEquipment: undefined
+        newEquipment: undefined,
+        infoOpen: false
       };
     },
     computed: {
@@ -297,12 +327,12 @@
         switch (this.radioSort) {
           case 'By rarity':
             result = this.findEquipment({
-              query: { $sort: { rarity: -1 } }
+              query: { $sort: { equipped: -1, rarity: -1 } }
             });
             break;
           case 'By acquired time':
             result = this.findEquipment({
-              query: { $sort: { acquiredTime: 1 } }
+              query: { $sort: { acquiredTime: -1 } }
             });
             break;
           default:
@@ -330,12 +360,22 @@
         //   );
         // }
       },
-      ...mapState('users', { user: 'copy' }),
+      ...mapGetters('users', { user: 'current' }),
       ...mapGetters('knights', { knight: 'current' }),
       ...mapFields('knight', ['willGem'])
     },
     methods: {
-      ...mapActions('equipments', { createEquipment: 'create' }),
+      ...mapActions('equipments', {
+        createEquipment: 'create',
+        removeEquipment: 'remove',
+        patchEquipment: 'patch'
+      }),
+      equip(_id) {
+        this.patchEquipment([_id, {}, { query: { action: 'equip' } }]);
+      },
+      unequip(_id) {
+        this.patchEquipment([_id, {}, { query: { action: 'unequip' } }]);
+      },
       closePanel() {
         this.$emit('close');
       },

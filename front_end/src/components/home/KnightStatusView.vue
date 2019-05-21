@@ -74,16 +74,15 @@
 
 <script>
   import { ASSETS_PROFILE } from 'assets';
-  import { mapActions, mapGetters, mapState } from 'vuex';
+  import { mapActions, mapGetters } from 'vuex';
   import { makeGetMixin } from 'feathers-vuex';
   import { mapFields } from '../../utils';
   import Bar from 'components/shared/Bar.vue';
   export default {
     components: { Bar },
     computed: {
-      // ...mapGetters('users', { user: 'copy' }),
-      ...mapState('knights', { knight: 'copy' }),
-      ...mapState('users', { user: 'copy' }),
+      ...mapGetters('knights', { knight: 'current' }),
+      ...mapGetters('users', { user: 'current' }),
       equippedOffHands() {
         if (!this.equipments) {
           return null;

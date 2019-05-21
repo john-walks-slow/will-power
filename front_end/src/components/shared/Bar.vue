@@ -3,7 +3,13 @@
     <el-progress
       class="bar"
       :class="type"
-      :percentage="value && maxValue ? Math.round((value / maxValue) * 100) : 0"
+      :percentage="
+        value && maxValue
+          ? value >= 0
+            ? Math.round((value / maxValue) * 100)
+            : 0
+          : 0
+      "
       :stroke-width="27"
       :text-inside="true"
       :color="color"

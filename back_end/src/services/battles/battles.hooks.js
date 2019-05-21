@@ -1,5 +1,11 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
 
+function updateProgress(context) {
+  if (context.result.hp<=0){
+  
+  }
+}
+
 module.exports = {
   before: {
     all: [authenticate('jwt')],

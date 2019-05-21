@@ -55,11 +55,7 @@
       target: Number,
       size: Number
     },
-    data() {
-      return {
-        currentTime: new Date().getTime()
-      };
-    },
+
     computed: {
       inner() {
         return `<i class="el-icon-plus iconCounterButton"></i><span class="spanCounterName">${

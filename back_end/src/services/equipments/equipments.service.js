@@ -1,7 +1,8 @@
 // Initializes the `equipments` service on path `/equipments`
 const createService = require('feathers-nedb');
 const createModel = require('../../models/equipments.model');
-const joinGet = require('../../utils/joinGet');
+const _patchDelta = require('../../utils/_patchDelta');
+const makePatchAction = require('../../utils/makePatchAction');
 const joinFind = require('../../utils/joinFind');
 
 const hooks = require('./equipments.hooks');
@@ -21,15 +22,19 @@ module.exports = function(app) {
   service.get = async function(id, params) {
     let equipment = await this._get(id, params);
     if (!equipment) {
-      return;
+      return {};
     }
-    let equipmentDetail = await joinGet(
-      [
-        app.service('equipments/off-hand-types'),
-        app.service('equipments/weapon-types')
-      ],
-      equipment.typeId
-    );
+    var equipmentDetail;
+    if (equipment.cat === 'weapon') {
+      equipmentDetail = await app
+        .service('equipments/weapon-types')
+        .get(equipment.typeId);
+    }
+    if (equipment.cat === 'offHand') {
+      equipmentDetail = await app
+        .service('equipments/off-hand-types')
+        .get(equipment.typeId);
+    }
     return Object.assign(equipmentDetail, equipment);
   };
   service.find = async function(params) {
@@ -57,11 +62,15 @@ module.exports = function(app) {
     return composedResults;
   };
   service.create = async function(data) {
-    let paySucceed = await app
-      .service('knights')
-      .patchGem(data.userId, -CREATE_COST);
-    if (!paySucceed) {
-      return;
+    let payResult = await app.service('knights')._patchDelta(data.userId, {
+      field: 'willGem',
+      delta: -CREATE_COST,
+      min: 0,
+      stayOriginal: true,
+      notify: true
+    });
+    if (!payResult) {
+      return {};
     }
     let rarity = 1;
     let random = Math.random();
@@ -93,6 +102,31 @@ module.exports = function(app) {
       cat: resultType.cat
     });
     return Object.assign(resultType, createResult);
+  };
+  service.patch = makePatchAction({
+    async equip(original) {
+      var { data: prevEquipped } = await this._find({
+        query: { equipped: true, cat: original.cat }
+      });
+      for (let prev of prevEquipped) {
+        let patchResult = await this._patch(prev._id, { equipped: false }, {});
+        this.emit('patched', patchResult);
+      }
+      return await this._patch(original.id, { equipped: true }, {});
+    },
+    async unequip(original) {
+      return await this._patch(original.id, { equipped: false }, {});
+    }
+  });
+
+  service.remove = async function(id, params) {
+    let equipment = await this.get(id);
+    await app.service('knights')._patchDelta(equipment.userId, {
+      field: 'willGem',
+      delta: equipment.rarity * equipment.rarity * 10,
+      notify: true
+    });
+    return await this._remove(id, params);
   };
   // Initialize our service with any options it requires
   app.use('/equipments', service);

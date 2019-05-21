@@ -19,7 +19,7 @@
 <style scoped>
   .buttonBossFight {
     /* position: relative;
-                                                                                                                                                                                                                                                                                                                                bottom: 10px; */
+                                                                                                                                                                                                                                                                                                                                          bottom: 10px; */
     border: none;
     background-color: black;
     color: white;
@@ -90,7 +90,7 @@
   }
 </style>
 <script>
-  import { mapState, mapActions } from 'vuex';
+  import { mapGetters } from 'vuex';
   import { mapFields } from '../../utils';
   import Bar from 'components/shared/Bar.vue';
   export default {
@@ -101,8 +101,8 @@
       };
     },
     computed: {
-      ...mapState('users', { user: 'copy' }),
-      ...mapState('battles', { battle: 'copy' }),
+      ...mapGetters('users', { user: 'current' }),
+      ...mapGetters('battles', { battle: 'current' }),
       ...mapFields('battle', ['hp', 'maxHp', 'level', 'levelProgress'])
     },
     mounted() {}

@@ -133,6 +133,7 @@
               console.log(this.$store.state.users.errorOnCreate);
               this.errorOnRegister = this.$store.state.users.errorOnCreate;
             }
+            this.$router.push('/login');
           } else {
             console.log('error submit!!');
             return false;

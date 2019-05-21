@@ -7,5 +7,6 @@ module.exports = function(app) {
     filename: path.join(dbPath, 'knights.db'),
     autoload: true
   });
+  Model.ensureIndex({ fieldName: '_id', unique: true });
   return Model;
 };

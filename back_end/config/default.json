@@ -3,8 +3,8 @@
   "port": 3030,
   "public": "../public/",
   "paginate": {
-    "default": 99,
-    "max": 999
+    "default": 999,
+    "max": 9999
   },
   "nedb": "../data",
   "authentication": {

@@ -63,12 +63,16 @@
     },
     computed: {
       inner() {
+        let currentTimePatched = this.currentTime;
+        if (this.currentTime < this.startTime) {
+          currentTimePatched = this.startTime;
+        }
         if (this.startTime) {
           return `<i class="el-icon-check iconTimerButton"></i><span class="spanTimerName">${
             this.timerName
           }</span><span class="spanTime">${Math.floor(
-            (this.currentTime - this.startTime) / 1000 / 60
-          )} m ${Math.floor((this.currentTime - this.startTime) / 1000) %
+            (currentTimePatched - this.startTime) / 1000 / 60
+          )} m ${Math.floor((currentTimePatched - this.startTime) / 1000) %
             60} s</span>`;
         } else {
           return `<i class="el-icon-caret-right iconTimerButton"></i><span class="spanTimerName">${

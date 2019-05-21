@@ -17,6 +17,8 @@ const channels = require('./channels');
 
 const authentication = require('./authentication');
 
+const scheduleTasks = require('./scheduleTasks');
+
 const app = express(feathers());
 
 // Load app configuration
@@ -50,4 +52,5 @@ app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);
 
+// scheduleTasks();
 module.exports = app;

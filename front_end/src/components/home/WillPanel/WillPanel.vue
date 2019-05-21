@@ -18,7 +18,15 @@
             :timerName="commitment.name"
             :progress="commitment.progress"
             :target="commitment.target"
+            :startTime="commitment.lastCommitmentStartTime"
             :size="140"
+            @click.native="
+              if (commitment.lastCommitmentStartTime) {
+                completeCommitment(commitment._id);
+              } else {
+                startCommitment(commitment._id);
+              }
+            "
           />
           <i class="el-icon-edit" @click="editWill(commitment)"></i>
         </div>
@@ -32,6 +40,7 @@
             :progress="perseverance.progress"
             :target="perseverance.target"
             :size="140"
+            @click.native="completePerseverance(perseverance._id)"
           />
           <i class="el-icon-edit" @click="editWill(perseverance)"></i>
         </div>
@@ -45,6 +54,7 @@
             :progress="restraint.progress"
             :target="restraint.target"
             :size="140"
+            @click.native="failRestraint(restraint._id)"
           />
           <i class="el-icon-edit" @click="editWill(restraint)"></i>
         </div>
@@ -411,7 +421,7 @@
       Panel
     },
     computed: {
-      ...mapState('users', { user: 'copy' }),
+      ...mapGetters('users', { user: 'current' }),
       ...mapState('commitments', {
         commitments: 'keyedById'
       }),
@@ -478,6 +488,18 @@
           cycle: 'day',
           active: true
         };
+      },
+      startCommitment(id) {
+        this.patchCommitment([id, {}, { query: { action: 'start' } }]);
+      },
+      completeCommitment(id) {
+        this.patchCommitment([id, {}, { query: { action: 'complete' } }]);
+      },
+      completePerseverance(id) {
+        this.patchPerseverance([id, {}, { query: { action: 'complete' } }]);
+      },
+      failRestraint(id) {
+        this.patchRestraint([id, {}, { query: { action: 'fail' } }]);
       },
       async submitCreateWill() {
         this.$refs['formCreate'].validate(async valid => {
