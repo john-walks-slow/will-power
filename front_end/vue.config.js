@@ -8,7 +8,7 @@ module.exports = {
       rules: [
         {
           test: /\.json$/,
-          include: [path.resolve(__dirname, 'src', 'assets')],
+          include: [path.resolve(__dirname, 'src', 'assets', 'monster')],
           use: 'file-loader',
           type: 'javascript/auto'
         }

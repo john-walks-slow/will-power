@@ -129,11 +129,11 @@
                 email: this.form.email,
                 password: this.form.password
               });
+              this.$router.push('/login');
             } catch (e) {
               console.log(this.$store.state.users.errorOnCreate);
               this.errorOnRegister = this.$store.state.users.errorOnCreate;
             }
-            this.$router.push('/login');
           } else {
             console.log('error submit!!');
             return false;

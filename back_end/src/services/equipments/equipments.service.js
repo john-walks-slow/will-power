@@ -112,10 +112,10 @@ module.exports = function(app) {
         let patchResult = await this._patch(prev._id, { equipped: false }, {});
         this.emit('patched', patchResult);
       }
-      return await this._patch(original.id, { equipped: true }, {});
+      return await this._patch(original._id, { equipped: true }, {});
     },
     async unequip(original) {
-      return await this._patch(original.id, { equipped: false }, {});
+      return await this._patch(original._id, { equipped: false }, {});
     }
   });
 

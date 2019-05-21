@@ -30,16 +30,14 @@ module.exports = {
           _id: context.result._id,
           hp: 50,
           wp: 50,
-          appearance: 'KnightMale',
           willGem: 0
         });
         await context.app.service('/battles').create({
           _id: context.result._id,
           level: 1,
-          levelProgress: 1,
-          monsterTypeId: 'test',
-          hp: 30
+          levelProgress: 1
         });
+        await context.app.service('battles')._newBattle(context.result._id);
         context.app.service('/users').emit('initComplete');
         // context.app.service('/game-progress').nextLevel();
       }

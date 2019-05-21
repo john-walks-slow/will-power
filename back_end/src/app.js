@@ -52,5 +52,5 @@ app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);
 
-// scheduleTasks();
+scheduleTasks(app);
 module.exports = app;

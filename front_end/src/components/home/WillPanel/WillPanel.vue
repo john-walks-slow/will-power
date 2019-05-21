@@ -11,7 +11,7 @@
         <!-- <span v-if="empty">You don't have any active will. </span> -->
         <div
           class="willItem"
-          v-for="commitment in activeCommitments"
+          v-for="commitment in commitments"
           :key="commitment.id"
         >
           <TimerButton
@@ -32,7 +32,7 @@
         </div>
         <div
           class="willItem"
-          v-for="perseverance in activePerseverances"
+          v-for="perseverance in perseverances"
           :key="perseverance.id"
         >
           <CounterButton
@@ -46,7 +46,7 @@
         </div>
         <div
           class="willItem"
-          v-for="restraint in activeRestraints"
+          v-for="restraint in restraints"
           :key="restraint.id"
         >
           <MinusButton
@@ -375,9 +375,6 @@
 
 <script>
   import Panel from 'components/shared/Panel.vue';
-  import CommitmentView from './CommitmentView.vue';
-  import PerseveranceView from './PerseveranceView.vue';
-  import RestraintView from './RestraintView.vue';
   import { ASSETS_UI } from 'assets';
   import TimerButton from './TimerButton.vue';
   import CounterButton from './CounterButton.vue';
@@ -422,36 +419,36 @@
     },
     computed: {
       ...mapGetters('users', { user: 'current' }),
-      ...mapState('commitments', {
-        commitments: 'keyedById'
+      ...mapGetters('commitments', {
+        commitments: 'list'
       }),
-      ...mapState('perseverances', {
-        perseverances: 'keyedById'
+      ...mapGetters('perseverances', {
+        perseverances: 'list'
       }),
-      ...mapState('restraints', {
-        restraints: 'keyedById'
+      ...mapGetters('restraints', {
+        restraints: 'list'
       }),
-      activeCommitments() {
-        console.log(this.commitments);
-        return this.commitments
-          ? Object.values(this.commitments).filter(w => w.active)
-          : [];
-      },
-      activePerseverances() {
-        return this.perseverances
-          ? Object.values(this.perseverances).filter(w => w.active)
-          : [];
-      },
-      activeRestraints() {
-        return this.restraints
-          ? Object.values(this.restraints).filter(w => w.active)
-          : [];
-      },
+      // activeCommitments() {
+      //   return this.commitments
+      //     ? Object.values(this.commitments).filter(w => w.active)
+      //     : [];
+      // },
+      // activePerseverances() {
+      //   console.log(Object.values(this.perseverances));
+      //   return this.perseverances
+      //     ? Object.values(this.perseverances).filter(w => w.active)
+      //     : [];
+      // },
+      // activeRestraints() {
+      //   return this.restraints
+      //     ? Object.values(this.restraints).filter(w => w.active)
+      //     : [];
+      // },
       empty() {
         return (
-          this.activeCommitments.length == 0 &&
-          this.activePerseverances.length == 0 &&
-          this.activeRestraints.length == 0
+          this.commitments.length == 0 &&
+          this.perseverances.length == 0 &&
+          this.restraints.length == 0
         );
       }
     },

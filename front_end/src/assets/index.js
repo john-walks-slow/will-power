@@ -1,7 +1,7 @@
 function importAll(r) {
   let assets = {};
   r.keys().map(item => {
-    assets[item.replace('./', '')] = r(item);
+    assets[item.replace('./', '').replace(/.*\//, '')] = r(item);
   });
   return assets;
 }
@@ -9,14 +9,11 @@ function importAll(r) {
 export const ASSETS_SCENE = importAll(
   require.context('assets/scene/', false, /.*/)
 );
-export const ASSETS_KNIGHT = importAll(
-  require.context('assets/knight/', false, /.*/)
-);
 export const ASSETS_MONSTER = importAll(
-  require.context('assets/monster/', false, /.*/)
+  require.context('assets/monster/', true, /.*/)
 );
 export const ASSETS_EQUIPMENT = importAll(
-  require.context('assets/equipment/', false, /.*/)
+  require.context('assets/equipment/', true, /.*/)
 );
 // export const ASSETS_FX = importAll(require.context('assets/fx/', false, /.*/));
 export const ASSETS_AVATAR = importAll(

@@ -8,5 +8,5 @@ module.exports = actionsMap =>
     if (!actionsMap.hasOwnProperty(action)) {
       return original;
     }
-    return await actionsMap[action].apply(this, [original]);
+    return await actionsMap[action].apply(this, [original, data]);
   };

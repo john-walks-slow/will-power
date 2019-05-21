@@ -8,6 +8,9 @@ const offHandTypes = require('./equipments/off-hand-types/off-hand-types.service
 const commitments = require('./wills/commitments/commitments.service.js');
 const perseverances = require('./wills/perseverances/perseverances.service.js');
 const restraints = require('./wills/restraints/restraints.service.js');
+const commitmentRecords = require('./wills/commitments/commitment-records/commitment-records.service.js');
+const perseveranceRecords = require('./wills/perseverances/perseverance-records/perseverance-records.service.js');
+const restraintRecords = require('./wills/restraints/restraint-records/restraint-records.service.js');
 // eslint-disable-next-line no-unused-vars
 module.exports = function(app) {
   app.configure(battles);
@@ -20,4 +23,7 @@ module.exports = function(app) {
   app.configure(commitments);
   app.configure(perseverances);
   app.configure(restraints);
+  app.configure(commitmentRecords);
+  app.configure(perseveranceRecords);
+  app.configure(restraintRecords);
 };

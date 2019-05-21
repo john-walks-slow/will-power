@@ -2,6 +2,9 @@
 const createService = require('feathers-nedb');
 const createModel = require('../../../models/perseverances.model');
 const hooks = require('./perseverances.hooks');
+const makePatchAction = require('../../../utils/makePatchAction');
+const sameDay = require('../../../utils/sameDay');
+var moment = require('moment');
 
 module.exports = function(app) {
   const Model = createModel(app);
@@ -12,35 +15,59 @@ module.exports = function(app) {
     paginate
   };
   let service = createService(options);
-  service.patch = async function(id, data, params) {
-    if (!params || !params.query || !params.query.action) {
-      return await this._patch(id, data, params);
+  service.get = async function(id, params) {
+    let result = await this._get(id, params);
+    let { data: records } = await app
+      .service('wills/perseverance-records')
+      .find({ query: { perseveranceId: id } });
+    let progress;
+    if (result.cycle === 'day') {
+      progress = records
+        .filter(r => sameDay(new Date(r.time), new Date()))
+        .reduce((i, current) => {
+          return i + current.progress;
+        }, 0);
+    } else if (result.cycle === 'week') {
+      progress = records
+        .filter(r => !moment(new Date(r.time)).isBefore(moment(), 'week'))
+        .reduce((i, current) => {
+          return i + current.progress;
+        }, 0);
     }
-    let { action } = params.query;
-    let currentPerseverance = await this._get(id);
-    var knight = await app.service('knights').get(currentPerseverance.userId);
-
-    switch (action) {
-    case 'complete':
-      await app.service('knights')._patchDelta(currentPerseverance.userId, {
+    return Object.assign(result, { records, progress });
+  };
+  service.find = async function(params) {
+    var results = await this._find(params);
+    for (let perseverance of results.data) {
+      Object.assign(perseverance, await this.get(perseverance._id));
+    }
+    return results;
+  };
+  service.create = async function(data, params) {
+    let result = await service._create(data, params);
+    return await this.get(result._id);
+  };
+  service.patch = makePatchAction({
+    async complete(original) {
+      var knight = await app.service('knights').get(original.userId);
+      await app.service('knights')._patchDelta(original.userId, {
         field: 'wp',
         max: knight.maxWp,
-        delta: Math.floor(
-          (currentPerseverance.progress < currentPerseverance.target
-            ? (1 / currentPerseverance.target) *
-                (currentPerseverance.cycle === 'day' ? 1 : 2)
+        delta: Math.round(
+          (original.progress < original.target
+            ? (1 / original.target) * (original.cycle === 'day' ? 1 : 3)
             : 0) * 50
         ),
         stayOriginal: false,
         notify: true
       });
-      data = { progress: currentPerseverance.progress + 1 };
-      break;
-    default:
-      break;
+      await app.service('wills/perseverance-records').create({
+        perseveranceId: original._id,
+        time: new Date().getTime()
+      });
+      return await this.get(original._id);
     }
-    return await this._patch(id, data, {});
-  };
+  });
   // Initialize our service with any options it requires
   app.use('/wills/perseverances', service);
 
