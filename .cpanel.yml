@@ -2,15 +2,16 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/willpowe/server/
-    - export PUBLICPATH=/home/willpowe/server/public
-    - rm -rf DEPLOYPATH
+    - export PUBLICPATH=/home/willpowe/server/public/
+    - export REPOPATH=/home/willpowe/repositories/will-power/
+    - cd $REPOPATH
     - cd back_end
     - npm install
     - cd ..
-    - /bin/cp -R back_end $DEPLOYPATH
+    - cp -TRv back_end $DEPLOYPATH
     - cd front_end
     - npm install
     - npm run build
-    - /bin/cp -R build $PUBLICPATH
-    - cd DEPLOYPATH
-    - cd npm start
+    - cp -TRv dist $PUBLICPATH
+    - cd $DEPLOYPATH
+    - npm run prod
