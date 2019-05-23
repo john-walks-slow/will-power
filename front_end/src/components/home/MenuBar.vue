@@ -12,6 +12,20 @@
     <el-tooltip
       class="item"
       effect="dark"
+      content="Leaderboard"
+      placement="top"
+    >
+      <el-button
+        class="buttonMenu"
+        id="buttonLeaderboardPanel"
+        @click="toggleLeaderboardPanel"
+        circle
+        ><img class="imgButton" :src="ICON_LEADERBOARD" alt="" srcset=""
+      /></el-button>
+    </el-tooltip>
+    <el-tooltip
+      class="item"
+      effect="dark"
       content="Achievements"
       placement="top"
     >
@@ -38,7 +52,7 @@
   #divContainer {
     position: fixed;
     /* left: 380px;
-                                                                                                                                                                                                                                                        top: 40px; */
+                                                                                                                                                                                                                                                                                      top: 40px; */
     bottom: 30px;
     left: 30px;
   }
@@ -55,6 +69,9 @@
   }
   #buttonEquipmentPanel {
     border: 4px solid #e96268;
+  }
+  #buttonLeaderboardPanel {
+    border: 4px solid #ffeb3b;
   }
   #buttonEquipmentPanel .imgButton {
     position: relative;
@@ -100,6 +117,7 @@
         ICON_EQUIPMENT: ASSETS_UI['IconEquipment.png'],
         ICON_WILL: ASSETS_UI['IconWill.png'],
         ICON_ACHIEVEMENT: ASSETS_UI['IconAchievement.png'],
+        ICON_LEADERBOARD: ASSETS_UI['IconLeaderboard.png'],
         ICON_TREASURE: ASSETS_UI['IconTreasure.png']
       };
     },
@@ -112,6 +130,9 @@
       },
       toggleAchievementPanel() {
         this.$emit('toggleAchievementPanel');
+      },
+      toggleLeaderboardPanel() {
+        this.$emit('toggleLeaderboardPanel');
       }
     },
     mounted() {}

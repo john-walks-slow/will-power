@@ -15,7 +15,7 @@ export const ASSETS_MONSTER = importAll(
 export const ASSETS_EQUIPMENT = importAll(
   require.context('assets/equipment/', true, /.*/)
 );
-// export const ASSETS_FX = importAll(require.context('assets/fx/', false, /.*/));
+export const ASSETS_FX = importAll(require.context('assets/fx/', false, /.*/));
 export const ASSETS_AVATAR = importAll(
   require.context('assets/avatar/', false, /.*/)
 );

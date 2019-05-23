@@ -1,13 +1,14 @@
 <template>
   <div>
+    <EffectCanvas />
     <DialogView />
     <LoadingView :progress="loadingProgress" :total="150" />
-
     <KnightStatusView />
     <MenuBar
       @toggleWillPanel="toggleWillPanel"
       @toggleEquipmentPanel="toggleEquipmentPanel"
       @toggleAchievementPanel="toggleAchievementPanel"
+      @toggleLeaderboardPanel="toggleLeaderboardPanel"
     />
     <GameProgressView />
     <WillPanel :open="isWillPanelOpen" @close="toggleWillPanel" />
@@ -19,22 +20,26 @@
       :open="isAchievementPanelOpen"
       @close="toggleAchievementPanel"
     />
-    <el-tooltip class="item" effect="dark" content="Attack" placement="top">
+    <LeaderboardPanel
+      :open="isLeaderboardPanelOpen"
+      @close="toggleLeaderboardPanel"
+    />
+    <!-- <el-tooltip class="item" effect="dark" content="Attack" placement="top">
       <el-button class="buttonAttack" @click="attack">
         <div>
           <img class="iconAttack" :src="ICON_ATTACK" alt="" srcset="" />
         </div>
       </el-button>
-    </el-tooltip>
+    </el-tooltip> -->
     <PixiCanvas @loading="updatePixiLoadingProgress" :camera="camera" />
     <KnightChooser />
-    <ErrorMessage
-      v-if="isError"
-      :errorMessage="errorMessage"
-      :errorType="errorType"
-    />
+    <ErrorMessage />
+    <GameMessage />
   </div>
 </template>
+<style>
+</style>
+
 <style scoped>
   .buttonAttack {
     border-radius: 100px;
@@ -75,10 +80,6 @@
 </style>
 
 <script>
-  import start from 'stories/index.js';
-  import Vue from 'vue';
-  import ErrorMessage from 'components/home/ErrorMessage.vue';
-  import KnightChooser from 'components/home/KnightChooser.vue';
   import LoadingView from 'components/LoadingView.vue';
   import DialogView from 'components/shared/DialogView.vue';
   import KnightStatusView from 'components/home/KnightStatusView.vue';
@@ -87,14 +88,15 @@
   import WillPanel from 'components/home/WillPanel/WillPanel.vue';
   import EquipmentPanel from 'components/home/EquipmentPanel/EquipmentPanel.vue';
   import AchievementPanel from 'components/home/AchievementPanel/AchievementPanel.vue';
-
+  import LeaderboardPanel from 'components/home/LeaderboardPanel/LeaderboardPanel.vue';
+  import GameMessage from 'components/home/GameMessage.vue';
+  import ErrorMessage from 'components/home/ErrorMessage.vue';
+  import { busError } from 'components/home/ErrorMessage.vue';
   import PixiCanvas from '../components/home/PixiCanvas.vue';
-
-  import { busPixi } from '../components/home/PixiCanvas.vue';
+  import EffectCanvas from 'components/home/EffectCanvas.vue';
 
   import { ASSETS_UI } from 'assets';
   import { mapState, mapActions } from 'vuex';
-  export const busError = new Vue();
   export default {
     name: 'home',
     components: {
@@ -105,10 +107,12 @@
       DialogView,
       KnightStatusView,
       MenuBar,
-      KnightChooser,
       GameProgressView,
       AchievementPanel,
-      ErrorMessage
+      ErrorMessage,
+      GameMessage,
+      EffectCanvas,
+      LeaderboardPanel
     },
     data() {
       return {
@@ -117,10 +121,12 @@
         isWillPanelOpen: false,
         isEquipmentPanelOpen: false,
         isAchievementPanelOpen: false,
+        isLeaderboardPanelOpen: false,
+
         isError: false,
         errorMessage: '',
-        errorType: '',
-        ICON_ATTACK: ASSETS_UI['IconAttack.png']
+        errorType: ''
+        // ICON_ATTACK: ASSETS_UI['IconAttack.png']
       };
     },
     computed: {
@@ -133,6 +139,7 @@
         }
         return this.isWillPanelOpen ||
           this.isEquipmentPanelOpen ||
+          this.isLeaderboardPanelOpen ||
           this.isAchievementPanelOpen
           ? 0
           : 1;
@@ -145,49 +152,41 @@
       },
       toggleWillPanel() {
         this.isWillPanelOpen = !this.isWillPanelOpen;
-        if (this.isEquipmentPanelOpen) {
-          this.isEquipmentPanelOpen = false;
-        }
-        if (this.isAchievementPanelOpen) {
-          this.isAchievementPanelOpen = false;
-        }
+        this.isEquipmentPanelOpen = false;
+        this.isAchievementPanelOpen = false;
+        this.isLeaderboardPanelOpen = false;
       },
       toggleEquipmentPanel() {
         this.isEquipmentPanelOpen = !this.isEquipmentPanelOpen;
-        if (this.isWillPanelOpen) {
-          this.isWillPanelOpen = false;
-        }
-        if (this.isAchievementPanelOpen) {
-          this.isAchievementPanelOpen = false;
-        }
+        this.isWillPanelOpen = false;
+        this.isAchievementPanelOpen = false;
+        this.isLeaderboardPanelOpen = false;
       },
       toggleAchievementPanel() {
         this.isAchievementPanelOpen = !this.isAchievementPanelOpen;
-        if (this.isWillPanelOpen) {
-          this.isWillPanelOpen = false;
-        }
-        if (this.isEquipmentPanelOpen) {
-          this.isEquipmentPanelOpen = false;
-        }
+        this.isEquipmentPanelOpen = false;
+        this.isWillPanelOpen = false;
+        this.isLeaderboardPanelOpen = false;
       },
-      attack() {
-        busPixi.$emit('knightAttack', 'attackMeleeHeavy');
-        this.patchKnight([this.user._id, {}, { query: { action: 'attack' } }]);
+      toggleLeaderboardPanel() {
+        this.isLeaderboardPanelOpen = !this.isLeaderboardPanelOpen;
+        this.isEquipmentPanelOpen = false;
+        this.isWillPanelOpen = false;
+        this.isAchievementPanelOpen = false;
       },
       ...mapActions('auth', ['authenticate']),
       ...mapActions('commitments', { findCommitments: 'find' }),
       ...mapActions('perseverances', { findPerseverances: 'find' }),
       ...mapActions('restraints', { findRestraints: 'find' }),
       ...mapActions('equipments', { findEquipments: 'find' }),
+      ...mapActions('dialogues', { findDialogues: 'find' }),
+      ...mapActions('messages', { findMessages: 'find' }),
       ...mapActions('knights', { getKnight: 'get', patchKnight: 'patch' }),
-      ...mapActions('battles', { getBattle: 'get' })
+      ...mapActions('battles', { getBattle: 'get' }),
+      ...mapActions('users', { findUsers: 'find' })
     },
     async mounted() {
-      busError.$on('error', e => {
-        this.isError = true;
-        // this.errorMessage = e.errorMessage;
-        this.errorType = e.message;
-      });
+      // window.document.body.style.cursor = `url(${ASSETS_UI['cursor.png']}), auto`;
       try {
         if (!this.accessToken && !window.localStorage.getItem('feathers-jwt')) {
           this.$router.push('/login');
@@ -209,6 +208,9 @@
           await this.getKnight(this.user._id);
           await this.getBattle(this.user._id);
           await this.findEquipments({ query: { userId: this.user._id } });
+          await this.findMessages({ query: { userId: this.user._id } });
+          await this.findDialogues({ query: { userId: this.user._id } });
+          await this.findUsers({ query: { leaderboard: true } });
         } catch (e) {
           console.log(e.stack);
           throw new Error('network');

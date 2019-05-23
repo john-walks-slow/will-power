@@ -1,5 +1,5 @@
 <template>
-  <div id="divPixi" :style="style"></div>
+  <div id="divPixi" :style="style" ref="divPixi"></div>
 </template>
 <style scoped>
   #divPixi {
@@ -21,8 +21,13 @@
   let Viewport = require('pixi-viewport');
   // let TWEEN = require('@tweenjs/tween.js');
 
-  import { ASSETS_MONSTER, ASSETS_SCENE } from 'assets';
-  import { mapGetters } from 'vuex';
+  import {
+    ASSETS_MONSTER,
+    ASSETS_SCENE,
+    ASSETS_FX,
+    ASSETS_EQUIPMENT
+  } from 'assets';
+  import { mapGetters, mapActions } from 'vuex';
 
   const GROUND_HEIGHT = 500;
   const SCREEN_HEIGHT = screen.height;
@@ -42,6 +47,7 @@
   let spriteBackground;
   let spriteDirt;
   let spriteGrass;
+  let spriteFx;
   let displayMonster;
   let animating = false;
   let swingCount = 0;
@@ -63,6 +69,9 @@
       },
       scene(v, o) {
         this.setupScene(v, o);
+      },
+      fx(v, o) {
+        this.setupFx(v, o);
       }
     },
     computed: {
@@ -77,6 +86,46 @@
         };
       },
       ...mapGetters('battles', { battle: 'current' }),
+      ...mapGetters('equipments', { equipments: 'list' }),
+      ...mapGetters('knights', { knight: 'current' }),
+      weapon() {
+        let weapons = this.equipments.filter(
+          w => w.equipped && w.cat === 'weapon'
+        );
+        if (weapons.length > 0) {
+          return weapons[0];
+        } else {
+          return null;
+        }
+      },
+      weaponType() {
+        let weapons = this.equipments.filter(
+          w => w.equipped && w.cat === 'weapon'
+        );
+        if (weapons.length > 0) {
+          return weapons[0].typeId;
+        } else {
+          return null;
+        }
+      },
+      attackable() {
+        if (this.weapon) {
+          return this.knight.wp >= this.weapon.wpConsumption;
+        } else {
+          return this.knight.wp >= 25;
+        }
+      },
+      fx() {
+        if (this.weaponType) {
+          if (Object.keys(ASSETS_FX).includes(this.weaponType + 'FX.png')) {
+            return this.weaponType + 'FX.png';
+          } else {
+            return this.weaponType.replace(/^[A-Z][a-z]*/, '') + 'FX.png';
+          }
+        } else {
+          return 'DefaultFX.png';
+        }
+      },
       monster() {
         return this.battle && this.loaded ? this.battle.monsterTypeId : undefined;
       },
@@ -87,6 +136,57 @@
       }
     },
     methods: {
+      ...mapActions('knights', { patchKnight: 'patch' }),
+      setupFx(name, old) {
+        function getFramesFromSpriteSheet(texture, frameWidth, frameHeight) {
+          var frames = [];
+          for (var i2 = 0; i2 < texture.height; i2 += frameHeight) {
+            for (var i = 0; i < texture.width; i += frameWidth) {
+              frames.push(
+                new PIXI.Texture(
+                  texture.baseTexture,
+                  new PIXI.Rectangle(i, i2, frameWidth, frameHeight)
+                )
+              );
+            }
+          }
+          return frames;
+        }
+        console.log(name);
+        spriteFx = new PIXI.extras.AnimatedSprite(
+          getFramesFromSpriteSheet(resources[name].texture, 192, 192)
+        );
+        spriteFx.zIndex = 9999;
+        spriteFx.loop = false;
+        spriteFx.animationSpeed = 0.5;
+        spriteFx.scale.set(2.5, 2.5);
+        spriteFx.blendMode = PIXI.BLEND_MODES.ADD;
+        spriteFx.onComplete = () => {
+          viewport.removeChild(spriteFx);
+        };
+      },
+      playFx(x, y) {
+        viewport.addChild(spriteFx);
+        if (this.fx.includes('Hook')) {
+          spriteFx.scale.set(2, 2);
+          x += spriteFx.width / 5;
+        }
+        if (this.fx.includes('Bow')) {
+          spriteFx.scale.set(5, 5);
+          x += spriteFx.width / 5;
+          y -= spriteFx.height / 7;
+        }
+        if (this.fx.includes('Dagger')) {
+          spriteFx.scale.set(1.5, 1.5);
+          spriteFx.animationSpeed = 0.7;
+        }
+        if (this.fx.includes('Hammer')) {
+          spriteFx.scale.set(4, 4);
+        }
+        spriteFx.x = x - spriteFx.width / 2;
+        spriteFx.y = y - spriteFx.height / 2;
+        spriteFx.gotoAndPlay(0);
+      },
       setupMonster(name, old) {
         if (!name) {
           return;
@@ -106,13 +206,55 @@
         displayMonster.animation.play('Idle', 0);
         displayMonster.x = WORLD_WIDTH / 2;
         displayMonster.y = WORLD_HEIGHT - GROUND_HEIGHT + 50;
-        displayMonster.animation.timeScale = 0.5;
+        displayMonster.animation.timeScale = 0.3;
 
         displayMonster.scale.set(1, 1);
         displayMonster.zIndex = 101;
         displayMonster.on(dragonBones.EventObject.COMPLETE, () => {
           displayMonster.animation.play('Idle', 0);
           animating = false;
+        });
+        displayMonster.interactive = true;
+        displayMonster.on('tap', event => {
+          this.playFx(
+            event.data.getLocalPosition(viewport).x,
+            event.data.getLocalPosition(viewport).y
+          );
+        });
+        displayMonster.on('mouseover', event => {
+          if (this.attackable) {
+            if (this.weapon) {
+              this.$refs.divPixi.style.cursor = `url(${
+                ASSETS_EQUIPMENT[this.weapon.typeId + '.png']
+              }), auto`;
+            } else {
+              this.$refs.divPixi.style.cursor = 'pointer';
+            }
+          } else {
+            this.$refs.divPixi.style.cursor = 'not-allowed';
+          }
+        });
+        displayMonster.on('mouseout', event => {
+          this.$refs.divPixi.style.cursor = '';
+        });
+        displayMonster.on('click', event => {
+          if (this.attackable) {
+            this.patchKnight([
+              this.knight._id,
+              {},
+              { query: { action: 'attack' } }
+            ]);
+            this.playFx(
+              event.data.getLocalPosition(viewport).x,
+              event.data.getLocalPosition(viewport).y
+            );
+            if (!animating) {
+              animating = true;
+              setTimeout(() => {
+                displayMonster.animation.play('Damage', 1);
+              }, 200);
+            }
+          }
         });
         viewport.addChild(displayMonster);
         this.setupCamera(this.camera, this.camera);
@@ -205,7 +347,7 @@
               { speed: 20, radius: 450, acceleration: 15 }
             );
             viewport.snapZoom({
-              height: (WORLD_HEIGHT / 1.8 / window.innerHeight) * SCREEN_HEIGHT
+              height: (WORLD_HEIGHT / 2.2 / window.innerHeight) * SCREEN_HEIGHT
             });
             if (old === CAMERA_STATE_FULL) {
               viewport.snap(viewport.center.x - MENU_WIDTH, viewport.center.y, {
@@ -222,7 +364,7 @@
               { speed: 20, radius: 450, acceleration: 15 }
             );
             viewport.snapZoom({
-              height: (WORLD_HEIGHT / 2 / window.innerHeight) * SCREEN_HEIGHT
+              height: (WORLD_HEIGHT / 2.5 / window.innerHeight) * SCREEN_HEIGHT
             });
             if (old === CAMERA_STATE_MENU) {
               viewport.snap(viewport.center.x + MENU_WIDTH, viewport.center.y, {
@@ -266,7 +408,7 @@
       app.renderer.view.style.display = 'block';
       app.renderer.autoResize = true;
       app.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
-      document.getElementById('divPixi').appendChild(app.view);
+      this.$refs.divPixi.appendChild(app.view);
       // setup viewport
       viewport = new Viewport({
         screenWidth: SCREEN_WIDTH,
@@ -316,11 +458,13 @@
       Object.keys(ASSETS_SCENE).forEach(name =>
         loader.add(name, ASSETS_SCENE[name])
       );
+      Object.keys(ASSETS_FX).forEach(name => loader.add(name, ASSETS_FX[name]));
       loader.onProgress.add(v => {
         this.$emit('loading', v.progress);
       });
       loader.load(() => {
         this.loaded = true;
+        this.setupFx(this.fx, this.fx);
         // Start drawing after loaded...
         viewport.moveCenter({
           x: WORLD_WIDTH / 2,

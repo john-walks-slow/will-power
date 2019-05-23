@@ -52,9 +52,9 @@ for (let i = 0; i <= 4; i++) {
     docsWeapon.push({
       _id: typeId,
       name: equipmentName,
-      damage: Math.round(attributes[i2][0] * (1 + 0.07 * (rarities[i] - 1))),
+      damage: Math.round(attributes[i2][0] * Math.pow(1.5, rarities[i] - 1)),
       wpConsumption: Math.round(
-        attributes[i2][1] * (1 - 0.07 * (rarities[i] - 1))
+        attributes[i2][1] * (1 + 0.1 * (rarities[i] - 1))
       ),
       rarity: rarities[i],
       cat: 'weapon'
@@ -71,8 +71,8 @@ for (let i = 0; i <= 4; i++) {
     docsOffHand.push({
       _id: typeId,
       name: equipmentName,
-      maxHp: Math.round(attributes[i2][0] * (1 + 0.07 * (rarities[i] - 1))),
-      maxWp: Math.round(attributes[i2][1] * (1 + 0.07 * (rarities[i] - 1))),
+      maxHp: Math.round(attributes[i2][0] * Math.pow(1.2, rarities[i] - 1)),
+      maxWp: Math.round(attributes[i2][1] * Math.pow(1.2, rarities[i] - 1)),
       rarity: rarities[i],
       cat: 'offHand'
     });

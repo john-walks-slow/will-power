@@ -15,6 +15,12 @@
           placeholder="Enter your email"
         ></el-input>
       </el-form-item>
+      <el-form-item prop="nickname">
+        <el-input
+          v-model="form.nickname"
+          placeholder="Enter your nickname"
+        ></el-input>
+      </el-form-item>
       <el-form-item prop="password">
         <el-input
           show-password
@@ -85,6 +91,7 @@
         errorOnRegister: false,
         form: {
           email: '',
+          nickname: '',
           password: '',
           password2: ''
         },
@@ -99,6 +106,14 @@
             {
               min: 4,
               message: 'Password has to contains more than 4 characters',
+              trigger: 'blur'
+            }
+          ],
+          nickname: [
+            {
+              required: true,
+
+              message: 'Please enter your nickname',
               trigger: 'blur'
             }
           ],
@@ -127,7 +142,8 @@
             try {
               await this.register({
                 email: this.form.email,
-                password: this.form.password
+                password: this.form.password,
+                nickname: this.form.nickname
               });
               this.$router.push('/login');
             } catch (e) {

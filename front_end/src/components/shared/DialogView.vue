@@ -1,12 +1,16 @@
 <template>
   <transition name="fade">
-    <el-main v-if="currentPage" id="backgroundDialog">
+    <el-main
+      v-if="dialogContent"
+      id="backgroundDialog"
+      @click.native="nextPage"
+    >
       <el-card id="cardDialog" shadow="always">
         <img id="imgAvatar" v-if="avatar" :src="avatar" />
         <div v-if="speaker" slot="header" class="clearfix">
           <b>{{ speaker }}</b>
         </div>
-        <div id="divDialogContent" @click="nextPage">
+        <div id="divDialogContent">
           <vue-typed-js
             id="typedDialog"
             :key="currentPage"
@@ -63,30 +67,32 @@
 </style>
 
 <script>
-  import Vue from 'vue';
+  import dialogues from 'models/dialogues.js';
   import { ASSETS_AVATAR } from 'assets';
-  export const busDialog = new Vue();
+  import { mapGetters, mapActions } from 'vuex';
+  import { mapFields } from '../../utils';
   export default {
     data() {
       return {
-        currentPage: null,
-        dialogContent: [
-          { speaker: 'Knight', sentence: `Who are you?` },
-          {
-            speaker: 'John',
-            sentence: `Hello! Let's start`
-          }
-        ]
+        currentPage: 1
       };
     },
     computed: {
+      ...mapGetters('dialogues', { dialogues: 'list' }),
       currentDialog() {
+        return this.dialogues.length >= 1 ? this.dialogues[0] : null;
+      },
+      ...mapFields('currentDialog', ['dialogId', '_id']),
+      dialogContent() {
+        return dialogues[this.dialogId];
+      },
+      currentContent() {
         return this.dialogContent && this.currentPage
           ? this.dialogContent[this.currentPage - 1]
           : null;
       },
       speaker() {
-        return this.currentDialog ? this.currentDialog.speaker : null;
+        return this.currentContent ? this.currentContent.speaker : null;
       },
       avatar() {
         if (this.speaker === 'Knight') {
@@ -99,31 +105,21 @@
           : null;
       },
       sentence() {
-        return this.currentDialog ? this.currentDialog.sentence : null;
+        return this.currentContent ? this.currentContent.sentence : null;
       }
     },
     methods: {
-      openDialog(dialogContent) {
-        console.log(dialogContent);
-        this.dialogContent = dialogContent;
-        this.currentPage = 1;
-      },
-      nextPage() {
+      ...mapActions('dialogues', { removeDialog: 'remove' }),
+      async nextPage() {
         if (this.currentPage) {
           if (this.currentPage >= this.dialogContent.length) {
-            this.currentPage = null;
-            busDialog.$emit('dialogClose');
+            this.currentPage = 1;
+            await this.removeDialog(this._id);
           } else {
             this.currentPage++;
           }
         }
       }
-    },
-    mounted() {
-      busDialog.$on('open', p => {
-        this.openDialog(p);
-      });
-      // this.openDialog(this.dialogContent);
     }
   };
 </script>

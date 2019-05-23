@@ -102,9 +102,9 @@
     },
     methods: {
       ...mapActions('auth', ['logout']),
-      submitLogout() {
-        this.logout();
-        this.$router.push('/login');
+      async submitLogout() {
+        await this.logout();
+        this.$router.go('/login');
       },
       handleDropdown(command) {
         switch (command) {

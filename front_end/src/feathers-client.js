@@ -1,5 +1,5 @@
 import auth from '@feathersjs/authentication-client';
-import { busError } from 'views/Home.vue';
+import { busError } from 'components/home/ErrorMessage.vue';
 import feathers from '@feathersjs/feathers';
 import io from 'socket.io-client';
 import socketio from '@feathersjs/socketio-client';

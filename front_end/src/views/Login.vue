@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <EffectCanvas />
     <img class="logo" :src="LOGO" alt="" srcset="" />
     <el-form title="Log In" :model="form" :rules="rules" ref="form">
       <el-form-item prop="email" :error="isLoginError ? 'Login fail' : null">
@@ -52,10 +53,13 @@
 <script>
   import { ASSETS_UI } from 'assets';
   import { mapActions, mapState } from 'vuex';
+  import EffectCanvas from 'components/home/EffectCanvas.vue';
+
   export default {
     data() {
       return {
         LOGO: ASSETS_UI['logo.png'],
+        isLoginError: false,
         form: {
           email: '',
           password: ''
@@ -89,19 +93,26 @@
         }
       };
     },
+    components: { EffectCanvas },
     methods: {
       async submitLogin() {
         await this.logout();
+        this.isLoginError = false;
         this.$refs['form'].validate(async valid => {
           if (valid) {
             console.log(this.authenticate);
-            let result = await this.authenticate({
-              strategy: 'local',
-              email: this.form.email,
-              password: this.form.password
-            });
-            if (result.accessToken) {
-              this.$router.push('/');
+            let result;
+            try {
+              result = await this.authenticate({
+                strategy: 'local',
+                email: this.form.email,
+                password: this.form.password
+              });
+              if (result.accessToken) {
+                this.$router.push('/');
+              }
+            } catch (e) {
+              this.isLoginError = true;
             }
           } else {
             return false;
@@ -115,12 +126,9 @@
     },
     computed: {
       ...mapState('auth', {
-        isLoginError: 'errorOnAuthenticate',
         isLoginPending: 'isAuthenticatePending',
         user: 'user'
       })
-    },
-
-    mounted() {}
+    }
   };
 </script>

@@ -12,20 +12,24 @@
       @click="giveUpBossFight()"
       >Give Up</el-button
     >
-    <span id="spanStage"
-      >LEVEL {{ level }}
+    <span id="spanStage">
+      LEVEL {{ level }}
       <span v-if="levelProgress <= 5">{{ levelProgress }}/5</span>
 
       <span v-if="levelProgress > 5">BOSS </span>
     </span>
-
+    <span>
+      <span class="spanMonsterName">{{ name }}</span>
+      <img class="iconDamage" :src="ICON_DAMAGE" alt="" />
+      <span class="spanDamage">{{ damage }}</span>
+    </span>
     <Bar class="barMonsterHp" type="monsterHp" :value="hp" :maxValue="maxHp" />
   </div>
 </template>
 <style scoped>
   .buttonBossFight {
     /* position: relative;
-                                                                                                                                                                                                                                                                                                                                                                    bottom: 10px; */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            bottom: 10px; */
     border: none;
     background-color: black;
     color: white;
@@ -45,8 +49,8 @@
   }
   #spanStage {
     font-family: 'silom';
-
-    font-size: 3rem;
+    display: block;
+    font-size: 2.6rem;
   }
   .spanBar {
     position: absolute;
@@ -85,6 +89,21 @@
     .el-progress-bar__innerText {
     display: none;
   }
+  .iconDamage {
+    width: 15px;
+    height: 15px;
+  }
+  .spanMonsterName {
+    position: fixed;
+    font-family: 'silom';
+    font-size: 1em;
+    right: 65px;
+  }
+  .spanDamage {
+    font-family: 'silom';
+
+    color: #661666;
+  }
   @media screen and (max-width: 1200px) {
     #spanStage {
       font-size: 1.5rem;
@@ -98,18 +117,26 @@
 <script>
   import { mapGetters, mapActions } from 'vuex';
   import { mapFields } from '../../utils';
+  import { ASSETS_UI } from 'assets';
   import Bar from 'components/shared/Bar.vue';
   export default {
     components: { Bar },
     data() {
       return {
-        gameProgress: null
+        ICON_DAMAGE: ASSETS_UI['IconSkull.png']
       };
     },
     computed: {
       ...mapGetters('users', { user: 'current' }),
       ...mapGetters('battles', { battle: 'current' }),
-      ...mapFields('battle', ['hp', 'maxHp', 'level', 'levelProgress'])
+      ...mapFields('battle', [
+        'hp',
+        'maxHp',
+        'level',
+        'levelProgress',
+        'name',
+        'damage'
+      ])
     },
     methods: {
       ...mapActions('battles', { patchBattle: 'patch' }),

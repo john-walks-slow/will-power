@@ -270,66 +270,6 @@
       ...mapGetters('restraints', {
         restraints: 'list'
       })
-      // commitments() {
-      //   let commitments = this.$store.state.wills.commitments.slice(0);
-      //   // function calculateRange(dates) {
-      //   //   let lastD;
-      //   //   let d = dates.sort();
-      //   //   let oldRange ={};
-      //   //   let range = {};
-      //   //   let oldStreak=0;
-      //   //   let streak=0;
-      //   //   d.forEach(d => {
-      //   //     if (new Date(d) - new Date(lastD) <= 86400000) {
-      //   //       streak++;
-      //   //       if (range.end === lastD) {
-      //   //         range.end = d;
-      //   //       } else {
-      //   //         if (range.end){
-      //   //           oldRange=range
-      //   //         }
-      //   //         range={ start: d, end: d };
-      //   //       }
-      //   //     }
-      //   //   });
-      //   //   console.log(ranges);
-      //   //   return ranges;
-      //   // }
-      //   commitments.forEach(c => {
-      //     c.accomplishedDates = c.records
-      //       ? c.records
-      //           .filter(r => r.progress >= c.target)
-      //           .map(r => new Date(r.recordDate).Format('d/M/yyyy'))
-      //       : [];
-      //   });
-      //   // commitments.forEach(c => {
-      //   //   c.accomplishedRanges = c.records
-      //   //     ? calculateRange(c.accomplishedDates)
-      //   //     : [];
-      //   // });
-      //   return commitments;
-      // },
-      // wills() {
-      //   let wills = [
-      //     ...this.$store.state.wills.commitments,
-      //     ...this.$store.state.wills.perseverances,
-      //     ...this.$store.state.wills.restraints
-      //   ];
-      //   wills.forEach(c => {
-      //     c.accomplishedDates = c.records
-      //       ? c.records
-      //           .filter(r => r.progress >= c.target)
-      //           .map(r => new Date(r.recordDate).Format('d/M/yyyy'))
-      //       : [];
-      //   });
-      //   return wills;
-      // },
-      // perseverances() {
-      //   return this.$store.state.wills.perseverances;
-      // },
-      // restraints() {
-      //   return this.$store.state.wills.restraints;
-      // }
     },
     mounted() {
       this.activeName = this.commitments[0]._id;

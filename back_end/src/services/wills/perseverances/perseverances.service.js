@@ -22,11 +22,8 @@ module.exports = function(app) {
       .find({ query: { perseveranceId: id } });
     let progress;
     if (result.cycle === 'day') {
-      progress = records
-        .filter(r => sameDay(new Date(r.time), new Date()))
-        .reduce((i, current) => {
-          return i + current.progress;
-        }, 0);
+      progress = records.filter(r => sameDay(new Date(r.time), new Date()))
+        .length;
     } else if (result.cycle === 'week') {
       progress = records
         .filter(r => !moment(new Date(r.time)).isBefore(moment(), 'week'))

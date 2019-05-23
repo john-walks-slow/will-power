@@ -16,12 +16,14 @@ module.exports = function(app) {
   const MONSTERS_EVERY_LEVEL = 5;
   function calculateMonster(monster, level) {
     return {
+      name: monster.name,
       maxHp: Math.round(monster.maxHp * Math.pow(1.15, level - 1)),
       damage: Math.round(monster.damage * Math.pow(1.15, level - 1))
     };
   }
   function calculateBoss(monster, level) {
     return {
+      name: monster.name,
       maxHp: Math.round(monster.maxHp * Math.pow(1.15, level - 1)) * 5,
       damage: Math.round(monster.damage * Math.pow(1.15, level - 1)) * 5
     };

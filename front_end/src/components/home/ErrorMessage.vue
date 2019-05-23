@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     title="Something went wrong"
-    :visible.sync="dialogVisible"
+    :visible="errorType"
     class="dialog"
     width="300px"
   >
@@ -36,21 +36,24 @@
 </template>
 <style scoped>
   /* .dialog /deep/ div {
-      margin-top: calc(50vh - 150px) !important;
-      margin-bottom: auto !important;
-      height: 300px;
-    } */
+                        margin-top: calc(50vh - 150px) !important;
+                        margin-bottom: auto !important;
+                        height: 300px;
+                      } */
 </style>
 <script>
+  import Vue from 'vue';
+  export const busError = new Vue();
   export default {
-    props: {
-      errorMessage: String,
-      errorType: String
-    },
     data() {
-      return {
-        dialogVisible: true
-      };
+      return { errorMessage: null, errorType: null };
+    },
+    mounted() {
+      busError.$on('error', e => {
+        this.isError = true;
+        // this.errorMessage = e.errorMessage;
+        this.errorType = e.message;
+      });
     }
   };
 </script>

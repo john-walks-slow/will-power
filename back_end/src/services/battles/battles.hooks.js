@@ -3,10 +3,20 @@ const MONSTERS_EVERY_LEVEL = 5;
 async function progressLevelIfMonsterDie(context) {
   if (context.result.hp && context.result.hp <= 0) {
     // gain will gem
+    if (context.result.levelProgress === 6) {
+      delta *= 8;
+    }
+    let delta = Math.round((Math.random() + 1) * +context.result.level * 30);
     await context.app.service('knights')._patchDelta(context.result._id, {
       field: 'willGem',
-      delta: Math.round(Math.random() * 30 + context.result.level * 10),
+      delta,
       notify: true
+    });
+    await context.app.service('messages').create({
+      title: 'Congratulations',
+      message:
+        'You defeat the monster and gain ' + delta.toString() + ' will gems.',
+      button: 'Great!'
     });
     // progress level
     context.result = await context.service._progressLevel(context.result._id);

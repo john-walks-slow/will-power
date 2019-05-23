@@ -58,12 +58,12 @@ module.exports = function(app) {
       var delta = Math.round(
         (currentTime - original.lastCommitmentStartTime) / 50000
       );
-      // var progress = Math.round(
-      //   (currentTime - original.lastCommitmentStartTime) / 60000
-      // );
       var progress = Math.round(
-        (currentTime - original.lastCommitmentStartTime) / 6000
+        (currentTime - original.lastCommitmentStartTime) / 60000
       );
+      // var progress = Math.round(
+      //   (currentTime - original.lastCommitmentStartTime) / 6000
+      // );
 
       await app.service('knights')._patchDelta(original.userId, {
         field: 'wp',

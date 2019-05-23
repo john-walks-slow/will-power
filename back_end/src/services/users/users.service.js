@@ -12,11 +12,27 @@ module.exports = function(app) {
     paginate,
     events: ['initStart', 'initComplete']
   };
-
+  let service = createService(options);
+  service.find = async function(params) {
+    if (!params || !params.query || !params.query.leaderboard) {
+      return await this._find(params);
+    } else {
+      let { data: topBattles } = await app
+        .service('battles')
+        .find({
+          query: { $sort: { level: -1, levelProgress: -1 }, $limit: 10 }
+        });
+      for (let battle of topBattles) {
+        let user = await this.get(battle._id);
+        Object.assign(battle, { nickname: user.nickname });
+      }
+      return topBattles;
+    }
+  };
   // Initialize our service with any options it requires
-  app.use('/users', Object.assign(createService(options)));
+  app.use('/users', Object.assign(service));
 
   // Get our initialized service so that we can register hooks
-  const service = app.service('users');
+  service = app.service('users');
   service.hooks(hooks);
 };

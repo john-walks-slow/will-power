@@ -25,7 +25,9 @@ module.exports = {
     get: [],
     create: [
       async function initUserData(context) {
-        context.app.service('/users').emit('initStart');
+        await context.app
+          .service('/dialogues')
+          .create({ userId: context.result._id, dialogId: 'intro' });
         await context.app.service('/knights').create({
           _id: context.result._id,
           hp: 50,
@@ -38,7 +40,6 @@ module.exports = {
           levelProgress: 1
         });
         await context.app.service('battles')._newBattle(context.result._id);
-        context.app.service('/users').emit('initComplete');
         // context.app.service('/game-progress').nextLevel();
       }
     ],

@@ -75,5 +75,7 @@ html {
 }
 .el-dialog {
   z-index: 99999;
+  margin-top: 15vh;
+  width: 500px !important;
 }
 @import '~element-ui/packages/theme-chalk/src/index';

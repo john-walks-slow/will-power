@@ -73,6 +73,15 @@
                 type="text"
                 @click="
                   equipment.infoOpen = false;
+                  advanceEquipment(equipment._id);
+                "
+                >Advance</el-button
+              >
+              <el-button
+                size="mini"
+                type="text"
+                @click="
+                  equipment.infoOpen = false;
                   removeEquipment(equipment._id);
                 "
                 >Decompose</el-button
@@ -94,7 +103,12 @@
                   srcset=""
                   alt=""
                 />
-                <span v-if="equipment.equipped" class="badgeEquipped">E</span>
+                <span
+                  :class="{ show: equipment.equipped }"
+                  class="badgeEquipped"
+                  >E</span
+                >
+                <span class="badgeTier">TIER {{ equipment.tier }}</span>
               </div>
             </el-popover>
           </div>
@@ -275,14 +289,25 @@
   }
   .badgeEquipped {
     position: relative;
+    visibility: hidden;
     font-size: 10px;
     left: 5px;
-    bottom: 30px;
+    bottom: 25px;
+    height: 10px;
+  }
+  .badgeEquipped.show {
+    visibility: visible;
+  }
+  .badgeTier {
+    position: relative;
+    font-size: 6px;
+    left: 22px;
+    bottom: 62px;
     height: 10px;
   }
   .divNewEquipmentInfo /deep/ div {
     /* margin-left: 100px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        margin-top: 10px; */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  margin-top: 10px; */
     color: black;
     font-size: 0.8rem !important;
   }
@@ -325,7 +350,7 @@
         switch (this.radioSort) {
           case 'By rarity':
             result = this.findEquipment({
-              query: { $sort: { equipped: -1, rarity: -1 } }
+              query: { $sort: { rarity: -1, name: 1 } }
             });
             break;
           case 'By acquired time':
@@ -373,6 +398,9 @@
       },
       unequip(_id) {
         this.patchEquipment([_id, {}, { query: { action: 'unequip' } }]);
+      },
+      advanceEquipment(_id) {
+        this.patchEquipment([_id, {}, { query: { action: 'advance' } }]);
       },
       closePanel() {
         this.$emit('close');

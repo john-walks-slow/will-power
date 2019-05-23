@@ -48,7 +48,7 @@
     top: 150px;
     height: calc(100vh - 270px);
     left: 50px;
-
+    overflow-y: auto;
     box-sizing: border-box;
     box-shadow: 0 2px 32px 0 rgba(0, 0, 0, 0.2);
   }

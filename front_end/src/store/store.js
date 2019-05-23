@@ -35,7 +35,9 @@ export default new Vuex.Store({
     service('wills/perseverances'),
     service('equipments'),
     service('equipments/weapons'),
-    service('battles')
+    service('battles'),
+    service('dialogues'),
+    service('messages')
     // createPersistedState({
     //   paths: ['auth.accessToken']
     // })

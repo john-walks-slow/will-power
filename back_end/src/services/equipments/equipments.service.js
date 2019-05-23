@@ -29,37 +29,26 @@ module.exports = function(app) {
       equipmentDetail = await app
         .service('equipments/weapon-types')
         .get(equipment.typeId);
+      equipmentDetail.damage *= Math.round(Math.pow(1.5, equipment.tier - 1));
+      equipmentDetail.wpConsumption *= Math.round(
+        Math.pow(1.1, equipment.tier - 1)
+      );
     }
     if (equipment.cat === 'offHand') {
       equipmentDetail = await app
         .service('equipments/off-hand-types')
         .get(equipment.typeId);
+      equipmentDetail.maxHp *= Math.round(Math.pow(1.3, equipment.tier - 1));
+      equipmentDetail.maxWp *= Math.round(Math.pow(1.3, equipment.tier - 1));
     }
     return Object.assign(equipmentDetail, equipment);
   };
   service.find = async function(params) {
-    try {
-      var results = await this._find(params);
-    } catch (e) {
-      console.log(e);
-    }
-    let composedResults = { data: [] };
+    var results = await this._find(params);
     for (let equipment of results.data) {
-      var equipmentDetail;
-      if (equipment.cat === 'weapon') {
-        equipmentDetail = await app
-          .service('equipments/weapon-types')
-          .get(equipment.typeId);
-      }
-      if (equipment.cat === 'offHand') {
-        equipmentDetail = await app
-          .service('equipments/off-hand-types')
-          .get(equipment.typeId);
-      }
-      equipment = Object.assign(equipmentDetail, equipment);
-      composedResults.data.push(equipment);
+      Object.assign(equipment, await this.get(equipment._id));
     }
-    return composedResults;
+    return results;
   };
   service.create = async function(data) {
     let payResult = await app.service('knights')._patchDelta(data.userId, {
@@ -94,14 +83,30 @@ module.exports = function(app) {
     );
     let resultTypeIndex = Math.floor(Math.random() * types.length);
     let resultType = types[resultTypeIndex];
+    let tier;
+    random = Math.random();
+    if (random >= 0.93) {
+      tier = 3;
+    } else if (random >= 0.85) {
+      tier = 2;
+    } else {
+      tier = 1;
+    }
     let createResult = await this._create({
       userId: data.userId,
       equipped: false,
       typeId: resultType._id,
+      tier: tier,
       acuiredTime: new Date().getTime(),
       cat: resultType.cat
     });
-    return Object.assign(resultType, createResult);
+    let result = Object.assign(resultType, createResult);
+    app.service('messages').create({
+      title: 'New Equipment',
+      message: `You forge a tier ${result.tier} ${result.name}`,
+      button: 'Great!'
+    });
+    return result;
   };
   service.patch = makePatchAction({
     async equip(original) {
@@ -116,9 +121,41 @@ module.exports = function(app) {
     },
     async unequip(original) {
       return await this._patch(original._id, { equipped: false }, {});
+    },
+    async advance(original) {
+      var { data: sameEquipment } = await this._find({
+        query: { typeId: original.typeId, tier: original.tier }
+      });
+      sameEquipment = sameEquipment.filter(e => e._id !== original._id);
+      if (sameEquipment.length >= 1) {
+        let consume = sameEquipment[0];
+        this._remove(consume._id, {});
+        this.emit('removed', { _id: consume._id });
+        let result = await this._patchDelta(original._id, {
+          field: 'tier',
+          delta: 1,
+          usePrivate: true
+        });
+        result = await this.get(original._id);
+        app.service('messages').create({
+          userId: original.userId,
+          title: 'Advance Succeed',
+          message: `Your ${result.name} is now Tier ${result.tier}.`,
+          button: 'Great!'
+        });
+        return result;
+      } else {
+        app.service('messages').create({
+          userId: original.userId,
+          title: 'Advance Fail',
+          message: 'You need 2 identical equipments to advance.',
+          button: 'I understand'
+        });
+        return original;
+      }
     }
   });
-
+  service._patchDelta = _patchDelta;
   service.remove = async function(id, params) {
     let equipment = await this.get(id);
     await app.service('knights')._patchDelta(equipment.userId, {
