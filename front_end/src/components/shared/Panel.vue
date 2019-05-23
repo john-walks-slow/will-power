@@ -32,6 +32,7 @@
     font-size: 1.5rem;
     margin-left: 10px;
     height: 20px;
+    margin-bottom: 10px;
   }
   .img {
     display: inline;

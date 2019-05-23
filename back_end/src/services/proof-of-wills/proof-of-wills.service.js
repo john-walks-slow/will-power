@@ -21,7 +21,7 @@ module.exports = function(app) {
     pows.forEach(pow => {
       let powCount = 0;
       records.forEach(record => {
-        let recordDate = moment(record, 'D/M/YYYY');
+        let recordDate = moment(record.day, 'D/M/YYYY');
         if (
           recordDate.isAfter(now.subtract(pow.period, pow.cycle + 's')) &&
           record.completed
@@ -35,7 +35,11 @@ module.exports = function(app) {
     });
     return { data: pows };
   };
-
+  service.create = async function(data, params) {
+    let result = await this._create(data, params);
+    result.powType = undefined;
+    return result;
+  };
   // Initialize our service with any options it requires
   app.use('/wills/proof-of-wills', service);
 

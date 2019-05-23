@@ -15,6 +15,7 @@
     "core-js": "^2.6.5",
     "element-ui": "^2.8.2",
     "feathers-vuex": "^1.7.0",
+    "moment": "^2.24.0",
     "pixi-viewport": "^3.21.0",
     "pixi.js": "^4.8.7",
     "prettier-eslint": "^8.8.2",

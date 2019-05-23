@@ -32,7 +32,6 @@
       </el-button>
     </el-tooltip> -->
     <PixiCanvas @loading="updatePixiLoadingProgress" :camera="camera" />
-    <KnightChooser />
     <ErrorMessage />
     <GameMessage />
   </div>

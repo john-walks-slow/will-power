@@ -18,32 +18,32 @@ export default {
       sentence: '< 规则解说 >'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '你说WILL-POWER（WP）是什么？顾名思义，WP就是在使用意志力的时候唤醒的能量喔！画面左上方的蓝色属性条显示的就是你目前的WP。'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '想要获得WILL-POWER，首先要确定一些你想实现的WILL———你的目标。它可以是一个你想培养的好习惯，想戒掉的坏习惯或是想投入时间做的事情'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '当你完成WILL时就能获得WP了，相反，如果你违背了自己的WILL，就会受到怪物的攻击并失去全部的WP啊 :( 不过不要慌张，就算失败了也可以重新来过的'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '当你通过完成WILL积累了足够WP时，点击怪物就能攻击它啦！每过5只怪就会有BOSS战，打赢了BOSS就能进入下一关。'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '打败怪物时会得到意志宝石，可以用它们锻造装备。坚持完成WILL还可以解锁能大幅加强战斗力的POW喔（Proof Of Will）。 (·ω·=)'
     },
     {
-      speaker: '< 规则解说 >',
+      speaker: null,
       sentence:
         '就是这样了~~更多内容请自行探索吧。希望它能帮助你更有动力的去生活'
     },
