@@ -31,6 +31,7 @@
   .title {
     font-size: 1.5rem;
     margin-left: 10px;
+    height: 20px;
   }
   .img {
     display: inline;
@@ -48,11 +49,9 @@
     top: 150px;
     height: calc(100vh - 270px);
     left: 50px;
-    overflow-y: auto;
     box-sizing: border-box;
     box-shadow: 0 2px 32px 0 rgba(0, 0, 0, 0.2);
   }
-
   @media screen and (max-width: 1200px) {
     #panel {
       width: 80%;

@@ -6,7 +6,8 @@ module.exports = {
   extends: ['plugin:vue/essential', 'eslint:recommended'],
   globals: {
     PIXI: false,
-    dragonBones: false
+    dragonBones: false,
+    particlesJS: false
   },
 
   rules: {

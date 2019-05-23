@@ -8,6 +8,8 @@ const makePatchAction = require('../../utils/makePatchAction');
 module.exports = function(app) {
   const Model = createModel(app);
   const paginate = app.get('paginate');
+  const CRITICAL_HIT_POSSIBILITY = 0.05;
+  const CRITICAL_HIT_DAMAGE = 5;
 
   const options = {
     Model,
@@ -17,15 +19,15 @@ module.exports = function(app) {
   function calculateMonster(monster, level) {
     return {
       name: monster.name,
-      maxHp: Math.round(monster.maxHp * Math.pow(1.15, level - 1)),
-      damage: Math.round(monster.damage * Math.pow(1.15, level - 1))
+      maxHp: Math.round(monster.maxHp * Math.pow(1.3, level - 1)),
+      damage: Math.round(monster.damage * Math.pow(1.2, level - 1))
     };
   }
   function calculateBoss(monster, level) {
     return {
       name: monster.name,
-      maxHp: Math.round(monster.maxHp * Math.pow(1.15, level - 1)) * 5,
-      damage: Math.round(monster.damage * Math.pow(1.15, level - 1)) * 5
+      maxHp: Math.round(monster.maxHp * Math.pow(1.3, level - 1)) * level,
+      damage: Math.round(monster.damage * Math.pow(1.2, level))
     };
   }
   let service = createService(options);
@@ -119,7 +121,36 @@ module.exports = function(app) {
       this._progressLevel(original._id, true);
     }
   });
-  service._patchDelta = _patchDelta;
+  service._patchDelta = async function(_id, data) {
+    let powIncreaseDamage = 1;
+    let powIncreaseCriticalHitPossibility = 1;
+    let powIncreaseCriticalHitDamage = 1;
+    if (data.field === 'hp' && data.delta < 0) {
+      let { data: willPows } = await app
+        .service('wills/proof-of-wills')
+        .find({ query: { userId: _id } });
+      willPows.forEach(pow => {
+        if (pow.powType == 'powIncreaseDamage') {
+          powIncreaseDamage *= pow.ratio;
+        }
+        if (pow.powType == 'powIncreaseCriticalHitPossibility') {
+          powIncreaseCriticalHitPossibility *= pow.ratio;
+        }
+        if (pow.powType == 'powIncreaseCriticalHitDamage') {
+          powIncreaseCriticalHitDamage *= pow.ratio;
+        }
+      });
+    }
+    let random = Math.random();
+    if (
+      random >
+      1 - powIncreaseCriticalHitPossibility * CRITICAL_HIT_POSSIBILITY
+    ) {
+      data.delta *= CRITICAL_HIT_DAMAGE * powIncreaseCriticalHitDamage;
+    }
+    data.delta *= powIncreaseDamage;
+    return await _patchDelta.apply(this, [_id, data]);
+  };
   // Initialize our service with any options it requires
   app.use('/battles', service);
 

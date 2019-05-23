@@ -113,8 +113,8 @@
       async nextPage() {
         if (this.currentPage) {
           if (this.currentPage >= this.dialogContent.length) {
-            this.currentPage = 1;
             await this.removeDialog(this._id);
+            this.currentPage = 1;
           } else {
             this.currentPage++;
           }

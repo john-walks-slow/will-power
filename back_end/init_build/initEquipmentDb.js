@@ -82,5 +82,6 @@ for (let i = 0; i <= 4; i++) {
 weaponModel.insert(docsWeapon, (e, n) => {
   console.log(n);
 });
-// weaponModel.insert({ test: 'test' });
-offHandModel.insert(docsOffHand);
+offHandModel.insert(docsOffHand, (e, n) => {
+  console.log(n);
+});

@@ -28,7 +28,6 @@
     ASSETS_EQUIPMENT
   } from 'assets';
   import { mapGetters, mapActions } from 'vuex';
-
   const GROUND_HEIGHT = 500;
   const SCREEN_HEIGHT = screen.height;
   const SCREEN_WIDTH = screen.width;
@@ -116,6 +115,9 @@
         }
       },
       fx() {
+        if (!this.loaded) {
+          return null;
+        }
         if (this.weaponType) {
           if (Object.keys(ASSETS_FX).includes(this.weaponType + 'FX.png')) {
             return this.weaponType + 'FX.png';
@@ -391,6 +393,9 @@
       }
     },
     mounted() {
+      busPixi.$on('attacked', () => {
+        displayMonster.animation.play('Attack A', 1);
+      });
       // Init the PIXI canvas
       app = new PIXI.Application({
         resolution: 1,

@@ -29,17 +29,23 @@ module.exports = function(app) {
       equipmentDetail = await app
         .service('equipments/weapon-types')
         .get(equipment.typeId);
-      equipmentDetail.damage *= Math.round(Math.pow(1.5, equipment.tier - 1));
-      equipmentDetail.wpConsumption *= Math.round(
-        Math.pow(1.1, equipment.tier - 1)
+      equipmentDetail.damage = Math.round(
+        equipmentDetail.damage * Math.pow(1.5, equipment.tier - 1)
+      );
+      equipmentDetail.wpConsumption = Math.round(
+        equipmentDetail.wpConsumption * Math.pow(1.1, equipment.tier - 1)
       );
     }
     if (equipment.cat === 'offHand') {
       equipmentDetail = await app
         .service('equipments/off-hand-types')
         .get(equipment.typeId);
-      equipmentDetail.maxHp *= Math.round(Math.pow(1.3, equipment.tier - 1));
-      equipmentDetail.maxWp *= Math.round(Math.pow(1.3, equipment.tier - 1));
+      equipmentDetail.maxHp = Math.round(
+        equipmentDetail.maxHp * Math.pow(1.3, equipment.tier - 1)
+      );
+      equipmentDetail.maxWp = Math.round(
+        equipmentDetail.maxWp * Math.pow(1.3, equipment.tier - 1)
+      );
     }
     return Object.assign(equipmentDetail, equipment);
   };
@@ -160,7 +166,11 @@ module.exports = function(app) {
     let equipment = await this.get(id);
     await app.service('knights')._patchDelta(equipment.userId, {
       field: 'willGem',
-      delta: equipment.rarity * equipment.rarity * 10,
+      delta:
+        equipment.rarity *
+        equipment.rarity *
+        15 *
+        Math.pow(2, equipment.tier - 1),
       notify: true
     });
     return await this._remove(id, params);

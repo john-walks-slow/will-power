@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible="currentMessage" width="30%">
+  <el-dialog :title="title" :visible="currentMessage !== null" width="30%">
     <span>{{ message }}</span>
     <span slot="footer" class="dialog-footer">
       <el-button

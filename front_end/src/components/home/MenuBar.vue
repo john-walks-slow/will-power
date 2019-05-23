@@ -1,14 +1,5 @@
 <template>
   <div id="divContainer">
-    <el-tooltip class="item" effect="dark" content="Equipments" placement="top">
-      <el-button
-        class="buttonMenu"
-        id="buttonEquipmentPanel"
-        @click="toggleEquipmentPanel"
-        circle
-        ><img class="imgButton" :src="ICON_EQUIPMENT" alt="" srcset=""
-      /></el-button>
-    </el-tooltip>
     <el-tooltip
       class="item"
       effect="dark"
@@ -23,12 +14,16 @@
         ><img class="imgButton" :src="ICON_LEADERBOARD" alt="" srcset=""
       /></el-button>
     </el-tooltip>
-    <el-tooltip
-      class="item"
-      effect="dark"
-      content="Achievements"
-      placement="top"
-    >
+    <el-tooltip class="item" effect="dark" content="Equipments" placement="top">
+      <el-button
+        class="buttonMenu"
+        id="buttonEquipmentPanel"
+        @click="toggleEquipmentPanel"
+        circle
+        ><img class="imgButton" :src="ICON_EQUIPMENT" alt="" srcset=""
+      /></el-button>
+    </el-tooltip>
+    <el-tooltip class="item" effect="dark" content="Pows" placement="top">
       <el-button
         class="buttonMenu"
         id="buttonAchievementPanel"
@@ -52,7 +47,7 @@
   #divContainer {
     position: fixed;
     /* left: 380px;
-                                                                                                                                                                                                                                                                                      top: 40px; */
+                                                                                                                                                                                                                                                                                            top: 40px; */
     bottom: 30px;
     left: 30px;
   }

@@ -13,7 +13,8 @@ module.exports = function(app) {
 
   const options = {
     Model,
-    paginate
+    paginate,
+    events: ['attacked']
   };
   let service = createService(options);
   const DEFAULT_MAX_HP = 50;
@@ -42,7 +43,59 @@ module.exports = function(app) {
     });
     return result;
   };
-  service._patchDelta = _patchDelta;
+  service._patchDelta = async function(_id, data) {
+    let powReduceDamageRecieved = 1;
+    let powIncreaseWpGain = 1;
+    let powReduceWpConsumption = 1;
+    let powIncreaseWillGemGain = 1;
+
+    if (data.field === 'hp' && data.delta < 0) {
+      let { data: willPows } = await app
+        .service('wills/proof-of-wills')
+        .find({ query: { userId: _id } });
+      willPows.forEach(pow => {
+        if (pow.powType == 'powReduceDamageRecieved') {
+          powReduceDamageRecieved *= pow.ratio;
+        }
+      });
+      data.delta /= powReduceDamageRecieved;
+    }
+
+    if (data.field === 'wp' && data.delta > 0) {
+      let { data: willPows } = await app
+        .service('wills/proof-of-wills')
+        .find({ query: { userId: _id } });
+      willPows.forEach(pow => {
+        if (pow.powType == 'powIncreaseWpGain') {
+          powIncreaseWpGain *= pow.ratio;
+        }
+      });
+      data.delta *= powIncreaseWpGain;
+    }
+    if (data.field === 'wp' && data.delta < 0) {
+      let { data: willPows } = await app
+        .service('wills/proof-of-wills')
+        .find({ query: { userId: _id } });
+      willPows.forEach(pow => {
+        if (pow.powType == 'powReduceWpConsumption') {
+          powReduceWpConsumption *= pow.ratio;
+        }
+      });
+      data.delta /= powReduceWpConsumption;
+    }
+    if (data.field === 'willGem' && data.delta > 0) {
+      let { data: willPows } = await app
+        .service('wills/proof-of-wills')
+        .find({ query: { userId: _id } });
+      willPows.forEach(pow => {
+        if (pow.powType == 'powIncreaseWillGemGain') {
+          powIncreaseWillGemGain *= pow.ratio;
+        }
+      });
+      data.delta *= powIncreaseWillGemGain;
+    }
+    return await _patchDelta.apply(this, [_id, data]);
+  };
   service.patch = makePatchAction({
     async attack(original) {
       let { data: weapon } = await app
@@ -78,7 +131,7 @@ module.exports = function(app) {
       return await this.get(original._id);
     }
   });
-  service._attacked = async function(_id, amount = 1) {
+  service._attacked = async function(_id, damageSource = undefined) {
     let original = await this.get(_id);
     let battle = await app.service('battles').get(_id);
     await this._patchDelta(_id, {
@@ -87,9 +140,22 @@ module.exports = function(app) {
       min: 0,
       notify: false
     });
+    if (damageSource) {
+      app.service('messages').create({
+        userId: original._id,
+        title: 'You Are Attacked When You Are Offline',
+        message: `Source: ${damageSource.reduce(
+          (i, c) => c + ',' + i
+        )} Damage: ${battle.damage * damageSource.length} (${battle.damage}*${
+          damageSource.length
+        })`,
+        button: '>_<'
+      });
+    }
+    this.emit('attacked', { data: undefined });
     return await this._patchDelta(_id, {
       field: 'hp',
-      delta: -battle.damage * amount,
+      delta: -battle.damage,
       min: 0,
       usePrivate: false,
       notify: true
@@ -97,60 +163,131 @@ module.exports = function(app) {
   };
 
   service._checkDailyWills = async function(_id) {
-    let uncompleted = 0;
-    let completed = 0;
     let serviceCommitment = app.service('wills/commitments');
     let serviceRestraint = app.service('wills/restraints');
     let servicePerseverance = app.service('wills/perseverances');
     let { data: commitments } = await serviceCommitment.find({
       query: { userId: _id, cycle: 'day' }
     });
-    uncompleted += commitments.filter(c => c.progress < c.target).length;
-    let { data: restraints } = await serviceRestraint.find({
-      query: { userId: _id, cycle: 'day' }
+    let uncompleted = [];
+    let completed = [];
+    commitments.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'commitment',
+        willId: c._id,
+        completed: c.progress >= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress < c.target) {
+        uncompleted.push(c.name);
+      }
     });
-    completed += restraints.filter(c => c.progress <= c.target).length;
     let { data: perseverances } = await servicePerseverance.find({
       query: { userId: _id, cycle: 'day' }
     });
-    uncompleted += perseverances.filter(c => c.progress < c.target).length;
+    perseverances.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'perseverance',
+        willId: c._id,
+        completed: c.progress >= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress < c.target) {
+        uncompleted.push(c.name);
+      }
+    });
+    let { data: restraints } = await serviceRestraint.find({
+      query: { userId: _id, cycle: 'day' }
+    });
+    restraints.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'restraint',
+        willId: c._id,
+        completed: c.progress <= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress > c.target) {
+        completed.push(c.name);
+      }
+    });
     let original = await this.get(_id);
-    await this._patchDelta(_id, {
+    this._patchDelta(_id, {
       field: 'wp',
       max: original.maxWp,
-      delta: 60 * completed,
+      delta: 60 * completed.length,
       stayOriginal: false,
       notify: true
     });
-    return await this._attacked(_id, uncompleted);
+    if (uncompleted.length > 0) {
+      this._attacked(_id, uncompleted);
+    }
   };
+
   service._checkWeeklyWills = async function(_id) {
-    let uncompleted = 0;
-    let completed = 0;
     let serviceCommitment = app.service('wills/commitments');
     let serviceRestraint = app.service('wills/restraints');
     let servicePerseverance = app.service('wills/perseverances');
     let { data: commitments } = await serviceCommitment.find({
       query: { userId: _id, cycle: 'week' }
     });
-    uncompleted += commitments.filter(c => c.progress < c.target).length;
-    let { data: restraints } = await serviceRestraint.find({
-      query: { userId: _id, cycle: 'week' }
+    let uncompleted = [];
+    let completed = [];
+    commitments.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'commitment',
+        willId: c._id,
+        completed: c.progress >= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress < c.target) {
+        uncompleted.push(c.name);
+      }
     });
-    completed += restraints.filter(c => c.progress <= c.target).length;
     let { data: perseverances } = await servicePerseverance.find({
       query: { userId: _id, cycle: 'week' }
     });
-    uncompleted += perseverances.filter(c => c.progress < c.target).length;
+    perseverances.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'perseverance',
+        willId: c._id,
+        completed: c.progress >= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress < c.target) {
+        uncompleted.push(c.name);
+      }
+    });
+    let { data: restraints } = await serviceRestraint.find({
+      query: { userId: _id, cycle: 'week' }
+    });
+    restraints.forEach(c => {
+      app.service('wills/check-records').create({
+        userId: _id,
+        willType: 'restraint',
+        willId: c._id,
+        completed: c.progress <= c.target,
+        date: moment().format('D/M/YYYY')
+      });
+      if (c.progress > c.target) {
+        completed.push(c.name);
+      }
+    });
     let original = await this.get(_id);
-    await this._patchDelta(_id, {
+    this._patchDelta(_id, {
       field: 'wp',
       max: original.maxWp,
-      delta: 150 * completed,
+      delta: 200 * completed.length,
       stayOriginal: false,
       notify: true
     });
-    return await this._attacked(_id, uncompleted * 3);
+    if (uncompleted.length > 0) {
+      this._attacked(_id, uncompleted);
+    }
   };
   // Initialize our service with any options it requires
   app.use('/knights', service);

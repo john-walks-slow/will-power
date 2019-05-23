@@ -16,21 +16,24 @@ module.exports = function(app) {
   let service = createService(options);
   service.get = async function(id, params) {
     let result = await this._get(id, params);
-    let { data: records } = await app
-      .service('wills/restraint-records')
-      .find({ query: { restraintId: id } });
+    let { data: records } = await app.service('wills/restraint-records').find({
+      query: {
+        restraintId: id
+      }
+    });
     let progress;
     if (result.cycle === 'day') {
       progress = records.filter(r => sameDay(new Date(r.time), new Date()))
         .length;
     } else if (result.cycle === 'week') {
-      progress = records
-        .filter(r => !moment(new Date(r.time)).isBefore(moment(), 'week'))
-        .reduce((i, current) => {
-          return i + current.progress;
-        }, 0);
+      progress = records.filter(
+        r => !moment(new Date(r.time)).isBefore(moment(), 'week')
+      ).length;
     }
-    return Object.assign(result, { records, progress });
+    return Object.assign(result, {
+      records,
+      progress
+    });
   };
   service.find = async function(params) {
     var results = await this._find(params);
@@ -45,15 +48,8 @@ module.exports = function(app) {
   };
   service.patch = makePatchAction({
     async fail(original) {
-      var battle = await app.service('battles').get(original.userId);
       if (original.progress >= original.target) {
-        await app.service('knights')._patchDelta(original.userId, {
-          field: 'hp',
-          min: 0,
-          delta: -battle.damage,
-          stayOriginal: false,
-          notify: true
-        });
+        await app.service('knights')._attacked(original.userId);
       }
       await app.service('wills/restraint-records').create({
         restraintId: original._id,
@@ -70,4 +66,12 @@ module.exports = function(app) {
   service = app.service('wills/restraints');
 
   service.hooks(hooks);
+  // // test
+  // service.create({
+  //   userId: 'test3',
+  //   name: 'testingRestraing',
+  //   target: 2,
+  //   cycle: 'day',
+  //   _id: 'testRestraint'
+  // });
 };

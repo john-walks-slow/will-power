@@ -19,4 +19,11 @@ module.exports = function(app) {
   const service = app.service('wills/commitment-records');
 
   service.hooks(hooks);
+  // // test
+  // service.create({
+  //   _id: 'test',
+  //   commitmentId: 'testCommitment',
+  //   progress: 9999999,
+  //   date: new Date().getTime()
+  // });
 };

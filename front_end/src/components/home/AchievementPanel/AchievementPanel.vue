@@ -1,35 +1,14 @@
 <template>
   <transition name="zoom">
     <Panel
-      title="ACHIEVEMENTS"
+      title="PROOF OF WILLS"
       :imgSrc="ICON_ACHIEVEMENT"
       v-if="open"
       color="#d784f8"
       :closePanel="closePanel"
     >
       <div slot="content" class="divContent">
-        <el-tabs class=".tab" v-model="activeName" @tab-click="onTabClick">
-          <el-tab-pane
-            v-for="commitment in commitments"
-            :key="commitment._id"
-            :label="commitment.name"
-            :name="commitment._id"
-          >
-            <FunctionalCalendar
-              v-model="calendarData"
-              :is-date-picker="true"
-              class="calendar"
-              :markedDates="calculateCommitmentCompletedDates(commitment)"
-            />
-            <div v-if="calendarData.selectedDate" class="divInfo">
-              <!-- {{
-                calculateCommitmentProgressByDay(
-                  commitment,
-                  new Date(calendarData.selectedDate)
-                )
-              }} -->
-            </div>
-          </el-tab-pane>
+        <el-tabs class=".tab" v-model="activeName">
           <el-tab-pane
             v-for="perseverance in perseverances"
             :key="perseverance._id"
@@ -40,23 +19,25 @@
               v-model="calendarData"
               :is-date-picker="true"
               class="calendar"
-              :markedDates="calculatePerseveranceCompletedDates(perseverance)"
+              :markedDates="calcMarkedDate(perseverance._id)"
             />
-          </el-tab-pane>
-          <el-tab-pane
-            v-for="restraint in restraints"
-            :key="restraint._id"
-            :label="restraint.name"
-            :name="restraint._id"
-          >
-            <FunctionalCalendar
-              v-model="calendarData"
-              :is-date-picker="true"
-              class="calendar"
-              :markedDates="calculateRestraintCompletedDates(restraint)"
-            />
+            <div v-if="calendarData.selectedDate" class="divInfo"></div>
           </el-tab-pane>
         </el-tabs>
+        <div class="divPow">
+          <div v-for="pow in currentPows" :key="pow._id">
+            <div class="powRow">
+              <span>{{
+                pow.powType ? camelToText(pow.powType) : '?????'
+              }}</span>
+              <span>*{{ pow.ratio * 100 }}%</span>
+              <span
+                >Complete {{ pow.target }} times in the last {{ pow.period }}
+                {{ pow.cycle }}s</span
+              >
+            </div>
+          </div>
+        </div>
       </div>
     </Panel>
   </transition>
@@ -66,44 +47,46 @@
     box-shadow: none !important;
     /* cursor: pointer; */
   }
-  .vfc-day {
-    transition: all 500ms;
-  }
-  .vfc-marked {
-    transition-delay: 100s;
-    background-color: #d784f8 !important;
-    transition: all 500ms;
-  }
+  /* .vfc-day {
+              transition: all 500ms;
+            }
+            .vfc-marked {
+              transition-delay: 100s;
+              background-color: #d784f8 !important;
+              transition: all 500ms;
+            }
 
-  .vfc-today {
-    background-color: #a5a5a5 !important;
-  }
-  .vfc-day :hover {
-    transform: scale(1.2);
-    transition: all 500ms;
-  }
-  .vfc-day :active {
-    background-color: #cecece;
-    transition: all 500ms;
-  }
-  .el-tabs__active-bar.is-top {
-    background-color: #d784f8;
-  }
-  .el-tabs__item.is-active {
-    color: #d784f8;
-  }
-  .el-tabs__item:hover {
-    color: #bc19fc;
-  }
+            .vfc-today {
+              background-color: #a5a5a5 !important;
+            }
+            .vfc-day :hover {
+              transform: scale(1.2);
+              transition: all 500ms;
+            }
+            .vfc-day :active {
+              background-color: #cecece;
+              transition: all 500ms;
+            }
+            .el-tabs__active-bar.is-top {
+              background-color: #d784f8;
+            }
+            .el-tabs__item.is-active {
+              color: #d784f8;
+            }
+            .el-tabs__item:hover {
+              color: #bc19fc;
+            } */
 </style>
 
 <style scoped>
   .divContent {
-    height: calc(100vh - 360px);
+    height: calc(100% - 40px);
     width: 100%;
     padding-top: 20px;
+    overflow-y: auto;
   }
   .tab {
+    height: 50%;
   }
   .calendar {
     width: 50%;
@@ -112,41 +95,10 @@
 </style>
 
 <script>
-  Date.prototype.Format = function(fmt) {
-    var o = {
-      'M+': this.getMonth() + 1, //月份
-      'd+': this.getDate(), //日
-      'h+': this.getHours(), //小时
-      'm+': this.getMinutes(), //分
-      's+': this.getSeconds(), //秒
-      'q+': Math.floor((this.getMonth() + 3) / 3), //季度
-      S: this.getMilliseconds() //毫秒
-    };
-    if (/(y+)/.test(fmt))
-      fmt = fmt.replace(
-        RegExp.$1,
-        (this.getFullYear() + '').substr(4 - RegExp.$1.length)
-      );
-    for (var k in o)
-      if (new RegExp('(' + k + ')').test(fmt))
-        fmt = fmt.replace(
-          RegExp.$1,
-          RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length)
-        );
-    return fmt;
-  };
   import FunctionalCalendar from 'vue-functional-calendar';
-
   import Panel from 'components/shared/Panel.vue';
   import { ASSETS_UI } from 'assets';
   import { mapState, mapGetters } from 'vuex';
-  function sameDay(d1, d2) {
-    return (
-      d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate()
-    );
-  }
 
   export default {
     props: {
@@ -168,95 +120,18 @@
         this.$emit('close');
       },
       onTabClick() {},
-      calculateCommitmentProgressByDay(commitment, date) {
-        console.log(commitment);
-        return commitment.records
-          .filter(r => sameDay(new Date(r.time), date))
-          .reduce((i, current) => {
-            return i + current.progress;
-          }, 0);
+      camelToText(string) {
+        var result = string.replace(/([A-Z])/g, ' $1');
+        return result.charAt(0).toUpperCase() + result.slice(1);
       },
-      calculateCommitmentCompletedDates(commitment) {
-        // new Date(r.recordDate).Format('d/M/yyyy'))
-        let completedDates = [];
-        commitment.records.reduce((i, current, index) => {
-          // if not same day, calculate progress
-          let currentDate = new Date(current.time);
-          if (
-            index != 0 &&
-            !sameDay(new Date(commitment.records[index - 1].time), currentDate)
-          ) {
-            let progress = this.calculateCommitmentProgressByDay(
-              commitment,
-              currentDate
-            );
-            if (progress >= commitment.target) {
-              completedDates.push(currentDate.timeFormat('d/M/yyyy'));
-            }
-            i = [];
-          }
-          i.push(current);
-          return i;
-        }, []);
-        return completedDates;
-      },
-      calculatePerseveranceProgressByDay(perseverance, date) {
-        console.log(perseverance);
-        return perseverance.records.filter(r => sameDay(new Date(r.time), date))
-          .length;
-      },
-      calculatePerseveranceCompletedDates(perseverance) {
-        // new Date(r.recordDate).Format('d/M/yyyy'))
-        let completedDates = [];
-        perseverance.records.reduce((i, current, index) => {
-          // if not same day, calculate progress
-          let currentDate = new Date(current.time);
-          if (
-            index != 0 &&
-            !sameDay(new Date(perseverance.records[index - 1].time), currentDate)
-          ) {
-            let progress = this.calculatePerseveranceProgressByDay(
-              perseverance,
-              currentDate
-            );
-            if (progress >= perseverance.target) {
-              completedDates.push(currentDate.timeFormat('d/M/yyyy'));
-            }
-            i = [];
-          }
-          i.push(current);
-          return i;
-        }, []);
-        return completedDates;
-      },
-      calculateRestraintProgressByDay(restraint, date) {
-        console.log(restraint);
-        return restraint.records.filter(r => sameDay(new Date(r.time), date))
-          .length;
-      },
-      calculateRestraintCompletedDates(restraint) {
-        // new Date(r.recordDate).Format('d/M/yyyy'))
-        let completedDates = [];
-        restraint.records.reduce((i, current, index) => {
-          // if not same day, calculate progress
-          let currentDate = new Date(current.time);
-          if (
-            index != 0 &&
-            !sameDay(new Date(restraint.records[index - 1].time), currentDate)
-          ) {
-            let progress = this.calculateRestraintProgressByDay(
-              restraint,
-              currentDate
-            );
-            if (progress <= restraint.target) {
-              completedDates.push(currentDate.timeFormat('d/M/yyyy'));
-            }
-            i = [];
-          }
-          i.push(current);
-          return i;
-        }, []);
-        return completedDates;
+      calcMarkedDate(willId) {
+        let result = this.records.filter(r => r.willId == willId && r.completed);
+        console.log(result);
+        if (result.length == 0) {
+          return null;
+        } else result = result.map(r => r.day);
+        console.log(result);
+        return result;
       }
     },
 
@@ -269,10 +144,27 @@
       }),
       ...mapGetters('restraints', {
         restraints: 'list'
-      })
+      }),
+      ...mapGetters('proof-of-wills', {
+        findPows: 'find'
+      }),
+      ...mapGetters('check-records', {
+        records: 'list'
+      }),
+      currentPows() {
+        return this.findPows({
+          query: { $sort: { period: 1 }, willId: this.activeName }
+        }).data;
+      }
     },
     mounted() {
-      this.activeName = this.commitments[0]._id;
+      if (this.commitments.length !== 0) {
+        this.activeName = this.this.commitments[0]._id;
+      } else if (this.perseverances.length !== 0) {
+        this.activeName = this.this.perseverances[0]._id;
+      } else if (this.restraints.length !== 0) {
+        this.activeName = this.this.restraints[0]._id;
+      }
     }
   };
 </script>

@@ -26,6 +26,7 @@
     "test": "npm run eslint && NODE_ENV= npm run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "dev": "nodemon src/",
+    "init": "cd init_build && node initEquipmentDb.js && node initMonsterDb.js",
     "start": "node src/",
     "mocha": "mocha test/ --recursive --exit",
     "prod": "pm2 start src/index.js --name will-power"

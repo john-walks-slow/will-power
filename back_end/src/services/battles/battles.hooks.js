@@ -2,11 +2,11 @@ const { authenticate } = require('@feathersjs/authentication').hooks;
 const MONSTERS_EVERY_LEVEL = 5;
 async function progressLevelIfMonsterDie(context) {
   if (context.result.hp && context.result.hp <= 0) {
+    let delta = Math.round((Math.random() + 1) * context.result.level * 25);
     // gain will gem
     if (context.result.levelProgress === 6) {
-      delta *= 8;
+      delta *= context.result.level * 2;
     }
-    let delta = Math.round((Math.random() + 1) * +context.result.level * 30);
     await context.app.service('knights')._patchDelta(context.result._id, {
       field: 'willGem',
       delta,

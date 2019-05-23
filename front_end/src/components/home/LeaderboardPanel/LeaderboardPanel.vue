@@ -62,6 +62,7 @@
 
   .divLeaderboardContainer {
     overflow-y: auto;
+    height: calc(100% - 40px);
     padding: 10px;
   }
   .divUserItem.me {

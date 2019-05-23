@@ -181,6 +181,8 @@
       ...mapActions('equipments', { findEquipments: 'find' }),
       ...mapActions('dialogues', { findDialogues: 'find' }),
       ...mapActions('messages', { findMessages: 'find' }),
+      ...mapActions('proof-of-wills', { findPows: 'find' }),
+      ...mapActions('check-records', { findRecords: 'find' }),
       ...mapActions('knights', { getKnight: 'get', patchKnight: 'patch' }),
       ...mapActions('battles', { getBattle: 'get' }),
       ...mapActions('users', { findUsers: 'find' })
@@ -210,6 +212,8 @@
           await this.findEquipments({ query: { userId: this.user._id } });
           await this.findMessages({ query: { userId: this.user._id } });
           await this.findDialogues({ query: { userId: this.user._id } });
+          await this.findPows({ query: { userId: this.user._id } });
+          await this.findRecords({ query: { userId: this.user._id } });
           await this.findUsers({ query: { leaderboard: true } });
         } catch (e) {
           console.log(e.stack);

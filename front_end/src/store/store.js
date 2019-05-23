@@ -33,6 +33,8 @@ export default new Vuex.Store({
     service('wills/commitments'),
     service('wills/restraints'),
     service('wills/perseverances'),
+    service('wills/proof-of-wills'),
+    service('wills/check-records'),
     service('equipments'),
     service('equipments/weapons'),
     service('battles'),

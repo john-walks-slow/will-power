@@ -97,4 +97,12 @@ module.exports = function(app) {
   service = app.service('wills/commitments');
 
   service.hooks(hooks);
+  // // test
+  // service.create({
+  //   userId: 'test2',
+  //   name: 'testingCommit',
+  //   target: 20,
+  //   cycle: 'week',
+  //   _id: 'testCommitment'
+  // });
 };

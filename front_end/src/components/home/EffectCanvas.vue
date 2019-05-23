@@ -78,7 +78,7 @@
         },
         retina_detect: true
       });
-      update = function() {
+      let update = function() {
         requestAnimationFrame(update);
       };
       requestAnimationFrame(update);
