@@ -30,7 +30,7 @@
     "start": "node src/",
     "mocha": "mocha test/ --recursive --exit",
     "prod": "NODE_ENV=production npm run start",
-    "deploy": "pm2 start src/index.js --name will-power"
+    "deploy": "NODE_ENV=production pm2 start src/index.js --name will-power"
   },
   "dependencies": {
     "@feathersjs/authentication": "^2.1.16",
