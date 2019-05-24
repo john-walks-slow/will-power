@@ -29,7 +29,8 @@
     "init": "cd init_build && node initEquipmentDb.js && node initMonsterDb.js",
     "start": "node src/",
     "mocha": "mocha test/ --recursive --exit",
-    "prod": "pm2 start src/index.js --name will-power"
+    "prod": "NODE_ENV=production npm run start",
+    "deploy": "pm2 start src/index.js --name will-power"
   },
   "dependencies": {
     "@feathersjs/authentication": "^2.1.16",
