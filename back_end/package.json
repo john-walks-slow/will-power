@@ -2,7 +2,6 @@
   "name": "will-power-back_end",
   "description": "",
   "version": "0.0.0",
-  "homepage": "",
   "main": "src",
   "keywords": [
     "feathers"
@@ -26,7 +25,8 @@
     "test": "npm run eslint && NODE_ENV= npm run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "mocha": "mocha test/ --recursive --exit",
-    "init": "cd init_build && node initEquipmentDb.js && node initMonsterDb.js",
+    "clean-data": "fsys --task=emptyDir --dir=./data",
+    "init": "npm run clean-data && cd ./init && node initEquipmentDb.js && node initMonsterDb.js",
     "dev": "cross-env NODE_ENV=development nodemon src/",
     "prod": "cross-env NODE_ENV=production pm2 start src/index.js --name will-power"
   },
@@ -57,6 +57,7 @@
     "eslint": "^5.16.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.19.0",
+    "fs-extra-cli": "0.0.4",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
   }
