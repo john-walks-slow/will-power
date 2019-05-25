@@ -17,6 +17,6 @@ const feathersClient = feathers()
 
 feathersClient.service('knights').on('attacked', function() {
   console.log('attacked');
-  busPixi.$emit('attacked');
+  busPixi.$emit('monsterAttack');
 });
 export default feathersClient;
