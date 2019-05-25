@@ -25,12 +25,10 @@
   "scripts": {
     "test": "npm run eslint && NODE_ENV= npm run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
-    "dev": "nodemon src/",
-    "init": "cd init_build && node initEquipmentDb.js && node initMonsterDb.js",
-    "start": "node src/",
     "mocha": "mocha test/ --recursive --exit",
-    "prod": "NODE_ENV=production npm run start",
-    "deploy": "NODE_ENV=production pm2 start src/index.js --name will-power"
+    "init": "cd init_build && node initEquipmentDb.js && node initMonsterDb.js",
+    "dev": "cross-env NODE_ENV=development nodemon src/",
+    "prod": "cross-env NODE_ENV=production pm2 start src/index.js --name will-power"
   },
   "dependencies": {
     "@feathersjs/authentication": "^2.1.16",
@@ -55,6 +53,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.19.0",

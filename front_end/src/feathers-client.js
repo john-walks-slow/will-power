@@ -5,7 +5,7 @@ import feathers from '@feathersjs/feathers';
 import io from 'socket.io-client';
 import socketio from '@feathersjs/socketio-client';
 
-const socket = io(process.env.VUE_APP_HOST, { transports: ['websocket'] });
+const socket = io(process.env.VUE_APP_BACK_END, { transports: ['websocket'] });
 socket.on('disconnect', function() {
   socket.emit('user disconnected');
   busError.$emit('error', new Error('network'));

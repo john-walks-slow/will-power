@@ -1,4 +1,4 @@
 {
-  "host": "willpower.click",
-  "port": "8080"
+  "host": "localhost",
+  "port": 8080
 }
