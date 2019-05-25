@@ -189,7 +189,6 @@
           }
           return frames;
         }
-        console.log(name);
         spriteFx = new PIXI.extras.AnimatedSprite(
           getFramesFromSpriteSheet(resources[name].texture, 192, 192)
         );
@@ -229,7 +228,6 @@
         if (displayMonster) {
           displayMonster.removeAllListeners();
         }
-        console.log(displayMonster);
         if (!name) {
           return;
         }
@@ -275,7 +273,6 @@
           );
         };
         displayMonster.damaged = e => {
-          console.log('dsd');
           animating = true;
           displayMonster.animation.play('Damage', 1);
         };
@@ -299,8 +296,6 @@
         let attack = ({ data }) => {
           let clickDeltaX = viewport.center.x - clickX;
           let clickDeltaY = viewport.center.y - clickY;
-          console.log(clickDeltaX);
-          console.log(clickDeltaY);
           if (Math.abs(clickDeltaX) <= 5 && Math.abs(clickDeltaY) <= 5) {
             if (this.attackable) {
               this.patchKnight([
