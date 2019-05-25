@@ -30,10 +30,10 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// Host the public folder only in production
+// Host the dist folder only in production
 if (process.env === 'production') {
-  app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
-  app.use('/', express.static(app.get('public')));
+  app.use(favicon(path.join(app.get('dist'), 'favicon.ico')));
+  app.use('/', express.static(app.get('dist')));
 }
 
 // Set up Plugins and providers

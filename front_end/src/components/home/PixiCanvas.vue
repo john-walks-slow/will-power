@@ -239,7 +239,7 @@
         displayMonster.on('mouseout', event => {
           this.$refs.divPixi.style.cursor = '';
         });
-        displayMonster.on('click', event => {
+        function attack() {
           if (this.attackable) {
             this.patchKnight([
               this.knight._id,
@@ -257,6 +257,12 @@
               }, 200);
             }
           }
+        }
+        displayMonster.on('click', event => {
+          attack();
+        });
+        displayMonster.on('touch', event => {
+          attack();
         });
         viewport.addChild(displayMonster);
         this.setupCamera(this.camera, this.camera);
