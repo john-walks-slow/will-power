@@ -19,6 +19,10 @@ module.exports = {
         'x-invalid-end-tag': false,
         'invalid-first-character-of-tag-name': false
       }
+    ],
+    'no-unused-vars': [
+      'error',
+      { vars: 'all', args: 'none', ignoreRestSiblings: false }
     ]
   },
   parserOptions: {

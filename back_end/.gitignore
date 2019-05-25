@@ -109,6 +109,5 @@ $RECYCLE.BIN/
 
 # Others
 data/
-public/
 lib/
 package-lock.json

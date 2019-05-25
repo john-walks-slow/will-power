@@ -40,7 +40,7 @@
         class="button"
         @click="submitRegister"
         :loading="isRegisterPending"
-        >Create</el-button
+        >Register</el-button
       >
       <router-link class="linkLogin" to="/login">Go to log in</router-link>
     </el-form>
