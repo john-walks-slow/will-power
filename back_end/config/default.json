@@ -1,6 +1,6 @@
 {
   "host": "localhost",
-  "port": 8080,
+  "port": 3030,
   "paginate": {
     "default": 999,
     "max": 9999
