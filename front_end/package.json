@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "deploy_clean": "fsys --task=emptyDir --dir=../back_end/public",
-    "deploy_copy_dist": "fsys --task=copy --filesFolders=dist/ --destination=../back_end/public/ --clobber='true' --preserveTimestamps='false'",
+    "deploy_copy_dist": "fsys --task=copy --filesFolders=dist/ --destination=../back_end/ --clobber='true' --preserveTimestamps='false'",
     "deploy": "npm run build && npm run deploy_clean && npm run deploy_copy_dist"
   },
   "dependencies": {
