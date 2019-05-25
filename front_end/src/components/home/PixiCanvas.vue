@@ -75,10 +75,7 @@
       monster(v, o) {
         this.setupMonster(v, o);
       },
-      isMonsterLowHp(v, o) {
-        if (v === true) {
-        }
-      },
+
       cursor(v, o) {
         this.$refs.divPixi.style.cursor = v;
       },
@@ -229,9 +226,8 @@
       },
 
       setupMonster(name, old) {
-        let isInit = false;
-        if (!displayMonster) {
-          isInit = true;
+        if (displayMonster) {
+          displayMonster.removeAllListeners();
         }
         console.log(displayMonster);
         if (!name) {
@@ -249,31 +245,39 @@
         displayMonster = monsterFactory.buildArmatureDisplay(
           resources[`${name}_ske.json`].data.armature[0].name
         );
-        displayMonster.animation.play('Idle', 0);
+        displayMonster.defaultAnim = 'Idle';
+        displayMonster.attackAnims = Object.keys(
+          displayMonster.animation.animations
+        ).filter(anim => anim.includes('Attack') || anim.includes('Skill'));
+        displayMonster.animation.play(displayMonster.defaultAnim, 0);
         displayMonster.x = WORLD_WIDTH / 2;
         displayMonster.y = WORLD_HEIGHT - GROUND_HEIGHT + 50;
-        displayMonster.animation.timeScale = 0.3;
+        displayMonster.animation.timeScale = 0.5;
 
         displayMonster.scale.set(1, 1);
         displayMonster.zIndex = 101;
         displayMonster.on(dragonBones.EventObject.COMPLETE, () => {
-          displayMonster.animation.play('Idle', 0);
+          displayMonster.animation.play(displayMonster.defaultAnim, 0);
           animating = false;
         });
+
         displayMonster.interactive = true;
         viewport.addChild(displayMonster);
         this.setupCamera(this.camera, this.camera);
-        if (!isInit) {
-          displayMonster.removeAllListeners();
-        }
-        displayMonster.attack = () => {
-          displayMonster.animation.play('Attack A', 1);
+
+        displayMonster.attack = e => {
+          animating = true;
+          displayMonster.animation.play(
+            displayMonster.attackAnims[
+              Math.floor(Math.random() * displayMonster.attackAnims.length)
+            ],
+            1
+          );
         };
-        displayMonster.damaged = () => {
-          if (!animating) {
-            animating = true;
-            displayMonster.animation.play('Damage', 1);
-          }
+        displayMonster.damaged = e => {
+          console.log('dsd');
+          animating = true;
+          displayMonster.animation.play('Damage', 1);
         };
         // Setup eventbus
         busPixi.$on('monsterAttack', displayMonster.attack);
@@ -304,6 +308,7 @@
                 {},
                 { query: { action: 'attack' } }
               ]);
+              busPixi.$emit('knightAttack');
               this.playFx(
                 data.getLocalPosition(viewport).x,
                 data.getLocalPosition(viewport).y
@@ -539,4 +544,7 @@
     }
   };
   export default vm;
+
+  // TODO: Support animation fade in
+  // TODO: PIXI Canvas should be based on event rather than pure data.
 </script>

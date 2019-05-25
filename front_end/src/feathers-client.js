@@ -16,7 +16,6 @@ const feathersClient = feathers()
   .configure(auth({ storage: window.localStorage }));
 
 feathersClient.service('knights').on('attacked', function() {
-  console.log('attacked');
   busPixi.$emit('monsterAttack');
 });
 export default feathersClient;
