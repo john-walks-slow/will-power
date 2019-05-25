@@ -28,7 +28,10 @@
     "clean-data": "fsys --task=emptyDir --dir=./data",
     "init": "npm run clean-data && cd ./init && node initEquipmentDb.js && node initMonsterDb.js",
     "dev": "cross-env NODE_ENV=development nodemon src/",
-    "prod": "pm2 restart ecosystem.config.js --env production"
+    "prod": "pm2 restart ecosystem.config.js --env production",
+    "prod-test": "pm2 restart ecosystem.config.js --env development",
+    "prod-stop": "pm2 stop ecosystem.config.js",
+    "prod-delete": "pm2 delete ecosystem.config.js"
   },
   "dependencies": {
     "@feathersjs/authentication": "^2.1.16",
