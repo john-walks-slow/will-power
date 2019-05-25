@@ -4,6 +4,7 @@ const createModel = require('../../../models/restraints.model');
 const hooks = require('./restraints.hooks');
 const makePatchAction = require('../../../utils/makePatchAction');
 const sameDay = require('../../../utils/sameDay');
+const findFromGets = require('../../../utils/findFromGets');
 var moment = require('moment');
 
 module.exports = function(app) {
@@ -35,13 +36,7 @@ module.exports = function(app) {
       progress
     });
   };
-  service.find = async function(params) {
-    var results = await this._find(params);
-    for (let restraint of results.data) {
-      Object.assign(restraint, await this.get(restraint._id));
-    }
-    return results;
-  };
+  service.find = findFromGets;
   service.create = async function(data, params) {
     let result = await service._create(data, params);
     return await this.get(result._id);

@@ -4,6 +4,7 @@ const createModel = require('../../../models/commitments.model');
 const hooks = require('./commitments.hooks');
 const makePatchAction = require('../../../utils/makePatchAction');
 const sameDay = require('../../../utils/sameDay');
+const findFromGets = require('../../../utils/findFromGets');
 var moment = require('moment');
 
 module.exports = function(app) {
@@ -36,13 +37,7 @@ module.exports = function(app) {
     }
     return Object.assign(result, { records, progress });
   };
-  service.find = async function(params) {
-    var results = await this._find(params);
-    for (let commitment of results.data) {
-      Object.assign(commitment, await this.get(commitment._id));
-    }
-    return results;
-  };
+  service.find = findFromGets;
   service.create = async function(data, params) {
     let result = await service._create(data, params);
     return await this.get(result._id);
