@@ -51,17 +51,22 @@
   let animating = false;
   let swingCount = 0;
 
-  let orgY;
   let orgX;
-  let zoomed;
+  let orgY;
+  let clickX;
+  let clickY;
+
+  let zoomed = false;
+  let moved = false;
+
   export let busPixi = new Vue();
 
-  export default {
+  let vm = {
     props: {
       camera: Number
     },
     data() {
-      return { loaded: false };
+      return { loaded: false, isMonsterHover: false };
     },
     watch: {
       camera(v, o) {
@@ -69,6 +74,13 @@
       },
       monster(v, o) {
         this.setupMonster(v, o);
+      },
+      isMonsterLowHp(v, o) {
+        if (v === true) {
+        }
+      },
+      cursor(v, o) {
+        this.$refs.divPixi.style.cursor = v;
       },
       scene(v, o) {
         this.setupScene(v, o);
@@ -135,6 +147,28 @@
       monster() {
         return this.battle && this.loaded ? this.battle.monsterTypeId : undefined;
       },
+      isMonsterLowHp() {
+        return this.battle && this.loaded
+          ? this.battle.hp < this.battle.maxHp / 2
+          : false;
+      },
+      cursor() {
+        let cursor;
+        if (this.isMonsterHover) {
+          if (this.attackable) {
+            if (this.weapon) {
+              cursor = `url(${
+                ASSETS_EQUIPMENT[this.weapon.typeId + '.png']
+              }), auto`;
+            } else {
+              cursor = 'pointer';
+            }
+          } else {
+            cursor = 'not-allowed';
+          }
+        } else cursor = '';
+        return cursor;
+      },
       scene() {
         return this.battle && this.loaded
           ? (Math.floor(this.battle.level / 5) % 4) + 1
@@ -193,7 +227,13 @@
         spriteFx.y = y - spriteFx.height / 2;
         spriteFx.gotoAndPlay(0);
       },
+
       setupMonster(name, old) {
+        let isInit = false;
+        if (!displayMonster) {
+          isInit = true;
+        }
+        console.log(displayMonster);
         if (!name) {
           return;
         }
@@ -221,26 +261,43 @@
           animating = false;
         });
         displayMonster.interactive = true;
-        displayMonster.on('mouseover', event => {
-          if (this.attackable) {
-            if (this.weapon) {
-              this.$refs.divPixi.style.cursor = `url(${
-                ASSETS_EQUIPMENT[this.weapon.typeId + '.png']
-              }), auto`;
-            } else {
-              this.$refs.divPixi.style.cursor = 'pointer';
-            }
-          } else {
-            this.$refs.divPixi.style.cursor = 'not-allowed';
+        viewport.addChild(displayMonster);
+        this.setupCamera(this.camera, this.camera);
+        if (!isInit) {
+          displayMonster.removeAllListeners();
+        }
+        displayMonster.attack = () => {
+          displayMonster.animation.play('Attack A', 1);
+        };
+        displayMonster.damaged = () => {
+          if (!animating) {
+            animating = true;
+            displayMonster.animation.play('Damage', 1);
           }
+        };
+        // Setup eventbus
+        busPixi.$on('monsterAttack', displayMonster.attack);
+        busPixi.$on('knightAttack', displayMonster.damaged);
+        displayMonster.on('mouseover', () => {
+          this.isMonsterHover = true;
         });
         displayMonster.on('mouseout', event => {
-          this.$refs.divPixi.style.cursor = '';
+          this.isMonsterHover = false;
         });
-        function attack() {
-          let deltaX = viewport.center.x - orgX;
-          let deltaY = viewport.center.y - orgY;
-          if (Math.abs(deltaX) <= 5 && Math.abs(deltaY) <= 5) {
+        displayMonster.on('mousedown', event => {
+          clickX = viewport.center.x;
+          clickY = viewport.center.y;
+        });
+        displayMonster.on('touchstart', event => {
+          clickX = viewport.center.x;
+          clickY = viewport.center.y;
+        });
+        let attack = ({ data }) => {
+          let clickDeltaX = viewport.center.x - clickX;
+          let clickDeltaY = viewport.center.y - clickY;
+          console.log(clickDeltaX);
+          console.log(clickDeltaY);
+          if (Math.abs(clickDeltaX) <= 5 && Math.abs(clickDeltaY) <= 5) {
             if (this.attackable) {
               this.patchKnight([
                 this.knight._id,
@@ -248,26 +305,14 @@
                 { query: { action: 'attack' } }
               ]);
               this.playFx(
-                event.data.getLocalPosition(viewport).x,
-                event.data.getLocalPosition(viewport).y
+                data.getLocalPosition(viewport).x,
+                data.getLocalPosition(viewport).y
               );
-              if (!animating) {
-                animating = true;
-                setTimeout(() => {
-                  displayMonster.animation.play('Damage', 1);
-                }, 200);
-              }
             }
           }
-        }
-        displayMonster.on('click', event => {
-          attack();
-        });
-        displayMonster.on('tap', event => {
-          attack();
-        });
-        viewport.addChild(displayMonster);
-        this.setupCamera(this.camera, this.camera);
+        };
+        displayMonster.on('click', attack);
+        displayMonster.on('tap', attack);
       },
       setupScene(scene, old) {
         if (!scene) {
@@ -313,32 +358,6 @@
         spriteDirt.y = WORLD_HEIGHT - GROUND_HEIGHT + spriteGrass.height;
         spriteDirt.zIndex = 2;
         viewport.addChild(spriteDirt);
-
-        viewport.removeListener('moved');
-        viewport.removeListener('zoomed');
-        app.ticker.remove(this.swing);
-        viewport.on('moved', t => {
-          if (t != 'clamp') {
-            if (zoomed) {
-              zoomed = false;
-            } else {
-              let deltaX = viewport.center.x - orgX;
-              let deltaY = viewport.center.y - orgY;
-              if (orgX && orgY) {
-                spriteBackground.tilePosition.set(
-                  spriteBackground.tilePosition.x + deltaX * 0.4,
-                  spriteBackground.tilePosition.y + deltaY * 0.4
-                );
-              }
-            }
-          }
-          orgX = viewport.center.x;
-          orgY = viewport.center.y;
-        });
-        viewport.on('zoomed', t => {
-          zoomed = true;
-        });
-        app.ticker.add(this.swing);
       },
 
       setupCamera(camera, old) {
@@ -399,9 +418,6 @@
       }
     },
     mounted() {
-      busPixi.$on('attacked', () => {
-        displayMonster.animation.play('Attack A', 1);
-      });
       // Init the PIXI canvas
       app = new PIXI.Application({
         resolution: 1,
@@ -490,16 +506,37 @@
         //   requestAnimationFrame(animate);
         //   TWEEN.update(time);
         // }
+        viewport.on('moved', t => {
+          if (!spriteBackground) {
+            return;
+          }
+          moved = true;
+          setTimeout(function() {
+            // body
+          });
+          if (t != 'clamp') {
+            if (zoomed) {
+              zoomed = false;
+            } else {
+              let deltaX = viewport.center.x - orgX;
+              let deltaY = viewport.center.y - orgY;
+              if (orgX && orgY) {
+                spriteBackground.tilePosition.set(
+                  spriteBackground.tilePosition.x + deltaX * 0.4,
+                  spriteBackground.tilePosition.y + deltaY * 0.4
+                );
+              }
+            }
+          }
+          orgX = viewport.center.x;
+          orgY = viewport.center.y;
+        });
+        viewport.on('zoomed', t => {
+          zoomed = true;
+        });
+        app.ticker.add(this.swing);
       });
-
-      // Setup eventbus
-      busPixi.$on('knightAttack', () => {
-        if (!animating) {
-          animating = true;
-          displayMonster.animation.play('Damage', 1);
-        }
-      });
-      busPixi.$on('');
     }
   };
+  export default vm;
 </script>
