@@ -2,8 +2,8 @@
 
 ## Reminders
 
-- Back end and front end are two separate packages.
-- We use `stable` branch for deployment. Server will use a postmerge hook to automamtically deploy the code, so we don't need to include `back_end/dist` in this repository.
+- Back end and front end are two separate npm packages
+- We use `stable` branch for deployment. We will include the ready-for-production front end in the `back_end/dist` of `stable` branch. Always make sure that `back_end/dist` is up to date before deploying. Any other branches shouldn't touch `back_end/dist`
 
 ## Git Conventions
 
