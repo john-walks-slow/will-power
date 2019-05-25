@@ -50,6 +50,10 @@
   let displayMonster;
   let animating = false;
   let swingCount = 0;
+
+  let orgY;
+  let orgX;
+  let zoomed;
   export let busPixi = new Vue();
 
   export default {
@@ -217,12 +221,6 @@
           animating = false;
         });
         displayMonster.interactive = true;
-        displayMonster.on('tap', event => {
-          this.playFx(
-            event.data.getLocalPosition(viewport).x,
-            event.data.getLocalPosition(viewport).y
-          );
-        });
         displayMonster.on('mouseover', event => {
           if (this.attackable) {
             if (this.weapon) {
@@ -240,28 +238,32 @@
           this.$refs.divPixi.style.cursor = '';
         });
         function attack() {
-          if (this.attackable) {
-            this.patchKnight([
-              this.knight._id,
-              {},
-              { query: { action: 'attack' } }
-            ]);
-            this.playFx(
-              event.data.getLocalPosition(viewport).x,
-              event.data.getLocalPosition(viewport).y
-            );
-            if (!animating) {
-              animating = true;
-              setTimeout(() => {
-                displayMonster.animation.play('Damage', 1);
-              }, 200);
+          let deltaX = viewport.center.x - orgX;
+          let deltaY = viewport.center.y - orgY;
+          if (Math.abs(deltaX) <= 5 && Math.abs(deltaY) <= 5) {
+            if (this.attackable) {
+              this.patchKnight([
+                this.knight._id,
+                {},
+                { query: { action: 'attack' } }
+              ]);
+              this.playFx(
+                event.data.getLocalPosition(viewport).x,
+                event.data.getLocalPosition(viewport).y
+              );
+              if (!animating) {
+                animating = true;
+                setTimeout(() => {
+                  displayMonster.animation.play('Damage', 1);
+                }, 200);
+              }
             }
           }
         }
         displayMonster.on('click', event => {
           attack();
         });
-        displayMonster.on('touch', event => {
+        displayMonster.on('tap', event => {
           attack();
         });
         viewport.addChild(displayMonster);
@@ -311,9 +313,7 @@
         spriteDirt.y = WORLD_HEIGHT - GROUND_HEIGHT + spriteGrass.height;
         spriteDirt.zIndex = 2;
         viewport.addChild(spriteDirt);
-        let orgY;
-        let orgX;
-        let zoomed;
+
         viewport.removeListener('moved');
         viewport.removeListener('zoomed');
         app.ticker.remove(this.swing);
