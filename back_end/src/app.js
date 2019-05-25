@@ -20,6 +20,7 @@ const authentication = require('./authentication');
 const scheduleTasks = require('./scheduleTasks');
 
 const app = express(feathers());
+const history = require('connect-history-api-fallback');
 
 // Load app configuration
 app.configure(configuration());
@@ -31,11 +32,12 @@ app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Host the dist folder only in production
-if (process.env === 'production') {
-  app.use(favicon(path.join(app.get('dist'), 'favicon.ico')));
-  app.use('/', express.static(app.get('dist')));
+if (app.get('public')) {
+  app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
+  app.use(express.static(app.get('public')));
+  app.use(history({ verbose: true }));
+  app.use(express.static(app.get('public')));
 }
-
 // Set up Plugins and providers
 app.configure(express.rest());
 app.configure(socketio());

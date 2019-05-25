@@ -28,7 +28,7 @@
     "clean-data": "fsys --task=emptyDir --dir=./data",
     "init": "npm run clean-data && cd ./init && node initEquipmentDb.js && node initMonsterDb.js",
     "dev": "cross-env NODE_ENV=development nodemon src/",
-    "prod": "cross-env NODE_ENV=production pm2 start src/index.js --name will-power"
+    "prod": "pm2 start ecosystem.config.js --env production"
   },
   "dependencies": {
     "@feathersjs/authentication": "^2.1.16",
@@ -40,6 +40,7 @@
     "@feathersjs/feathers": "^3.3.1",
     "@feathersjs/socketio": "^3.2.9",
     "compression": "^1.7.4",
+    "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "express-request-logger": "0.0.3",
     "feathers-nedb": "^4.0.1",
