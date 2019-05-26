@@ -3,7 +3,7 @@
 ## Reminders
 
 - Back end and front end are two separate npm packages
-- We use `stable` branch for deployment. We will include the ready-for-production front end in the `back_end/dist` of `stable` branch. Always make sure that `back_end/dist` is up to date before deploying. Any other branches shouldn't touch `back_end/dist`
+- We use `stable` branch for deployment. We have a hook on the server to auto-deploy the code, so we don't need to include the dist folder.
 
 ## Git Conventions
 
