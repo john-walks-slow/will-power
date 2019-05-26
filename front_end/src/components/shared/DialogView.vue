@@ -16,7 +16,7 @@
             :key="currentPage"
             :strings="[sentence]"
             :autoInsertCss="true"
-            :typeSpeed="10"
+            :typeSpeed="20"
             :showCursor="false"
           >
             <p class="typing"></p>
