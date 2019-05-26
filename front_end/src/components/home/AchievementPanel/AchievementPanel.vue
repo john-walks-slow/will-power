@@ -1,7 +1,7 @@
 <template>
   <transition name="zoom">
     <Panel
-      title="PROOF OF WILLS"
+      title="POWS"
       :imgSrc="ICON_ACHIEVEMENT"
       v-if="open"
       color="#d784f8"
@@ -10,39 +10,109 @@
       <div slot="content" class="divContent">
         <el-tabs v-model="activeName" class="tab">
           <el-tab-pane
+            v-for="commitment in commitments"
+            :key="commitment._id"
+            :label="commitment.name"
+            :name="commitment._id"
+            class="innerTab"
+          >
+            <el-row
+              class="rowPow"
+              v-for="pow in calcCurrentPows(commitment._id)"
+              :key="pow._id"
+            >
+              <el-col
+                :span="12"
+                class="colPowProgress"
+                :class="{ active: pow.powType }"
+                ><span class="spanPowProgress">{{ pow.progress }} /</span>
+                {{ pow.target }} success in {{ pow.period }}
+                {{ pow.cycle }}s</el-col
+              >
+              <el-col :span="12" class="colPowType active" v-if="pow.powType">{{
+                powToText(pow)
+              }}</el-col>
+              <el-col :span="12" class="colPowType" v-else>????????????</el-col>
+            </el-row>
+            <el-divider />
+          </el-tab-pane>
+          <el-tab-pane
             v-for="perseverance in perseverances"
             :key="perseverance._id"
             :label="perseverance.name"
             :name="perseverance._id"
             class="innerTab"
           >
-            <FunctionalCalendar
-              :sundayStart="false"
-              v-model="calendarData"
-              :is-date-picker="false"
-              class="calendar"
-              :markedDates="calcMarkedDate(perseverance._id)"
-            />
-            <el-row>
-              <el-col :span="12">Buff</el-col>
-              <el-col :span="12">Unleash Condition</el-col>
-            </el-row>
             <el-row
+              class="rowPow"
               v-for="pow in calcCurrentPows(perseverance._id)"
               :key="pow._id"
             >
               <el-col
-                >{{ pow.powType ? camelToText(pow.powType) : '?????' }}*{{
-                  pow.ratio * 100
-                }}%</el-col
+                :span="12"
+                class="colPowProgress"
+                :class="{ active: pow.powType }"
+                ><span class="spanPowProgress">{{ pow.progress }} /</span>
+                {{ pow.target }} success in {{ pow.period }}
+                {{ pow.cycle }}s</el-col
               >
-              <el-col
-                >Complete {{ pow.target }} times in the last {{ pow.period }}
-                {{ pow.cycle }}s to unleash
-                {{ pow.target - calcProgress(pow) }} times remain.</el-col
-              >
+              <el-col :span="12" class="colPowType active" v-if="pow.powType">{{
+                powToText(pow)
+              }}</el-col>
+              <el-col :span="12" class="colPowType" v-else>????????????</el-col>
             </el-row>
+            <el-divider />
           </el-tab-pane>
+
+          <el-tab-pane
+            v-for="restraint in restraints"
+            :key="restraint._id"
+            :label="restraint.name"
+            :name="restraint._id"
+            class="innerTab"
+          >
+            <el-row
+              class="rowPow"
+              v-for="pow in calcCurrentPows(restraint._id)"
+              :key="pow._id"
+            >
+              <el-col
+                :span="12"
+                class="colPowProgress"
+                :class="{ active: pow.powType }"
+                ><span class="spanPowProgress">{{ pow.progress }} /</span>
+                {{ pow.target }} success in {{ pow.period }}
+                {{ pow.cycle }}s</el-col
+              >
+              <el-col :span="12" class="colPowType active" v-if="pow.powType">{{
+                powToText(pow)
+              }}</el-col>
+              <el-col :span="12" class="colPowType" v-else>????????????</el-col>
+            </el-row>
+            <el-divider />
+          </el-tab-pane>
+          <el-row v-if="activeName !== undefined && activeName !== '0'">
+            <el-col :span="9">
+              <FunctionalCalendar
+                :sundayStart="false"
+                v-model="calendarData"
+                :is-date-picker="false"
+                class="calendar"
+                :key="activeName"
+                :markedDates="markedDates"
+              />
+            </el-col>
+            <el-col :span="15">
+              <ve-pie
+                class="powPie"
+                :settings="{ radius: 80, offsetY: 100 }"
+                :data="calcedData"
+                :legend-visible="false"
+                height="200px"
+                width="300px"
+              />
+            </el-col>
+          </el-row>
         </el-tabs>
       </div>
     </Panel>
@@ -59,26 +129,26 @@
     transition: all 500ms;
   }
   .completed {
-    background-color: #adfff8 !important;
+    background-color: #b7faf1 !important;
   }
   .uncompleted {
-    background-color: #f6b4ff !important;
+    background-color: #fcbeb5 !important;
   }
   .vfc-today {
-    background-color: #000000 !important;
+    background-color: #bebebe !important;
   }
   .vfc-day :hover {
     transform: scale(1.2);
     transition: all 500ms;
   }
   .el-tabs__active-bar.is-top {
-    background-color: #d784f8;
+    background-color: #60e4d2;
   }
   .el-tabs__item.is-active {
-    color: #d784f8;
+    color: #6ce2d2;
   }
   .el-tabs__item:hover {
-    color: #bc19fc;
+    color: #b7faf1;
   }
 </style>
 
@@ -91,7 +161,7 @@
   }
   .tab {
     width: 100%;
-    height: calc(100% - 40px);
+    height: calc(100% - 240px);
     display: inline-block !important;
   }
   .div-pow {
@@ -100,9 +170,39 @@
     display: inline-block !important;
   }
   .calendar {
-    width: 100%;
-    height: 400px;
+    width: 200px;
+    height: 220px;
+    font-size: 1em;
+  }
+  .titlePow {
+    font-size: 0.9em;
+  }
+  .rowPow {
     font-size: 0.8em;
+    font-family: 'silom';
+  }
+  .powPie {
+    width: 200px !important;
+    height: 200px !important;
+    display: inline-block !important;
+  }
+  .colPowProgress {
+    color: #b4b4b4;
+  }
+  .colPowProgress.active {
+    color: #46e2cd;
+  }
+  .spanPowProgress {
+    color: #9ff1e7;
+  }
+  .colPowProgress.active .spanPowProgress {
+    color: #46e2cd;
+  }
+  .colPowType {
+    color: #edbeff;
+  }
+  .colPowType.active {
+    color: #bc19fc;
   }
 </style>
 
@@ -133,39 +233,18 @@
         this.$emit('close');
       },
       onTabClick() {},
-      camelToText(string) {
-        var result = string.replace(/([A-Z])/g, ' $1');
-        return result.charAt(0).toUpperCase() + result.slice(1);
-      },
-      calcMarkedDate(willId) {
-        let result = [];
-        this.records.forEach(r => {
-          if (r.willId == willId) {
-            if (r.completed) {
-              result.push({ date: r.day, class: 'completed' });
-            } else {
-              result.push({ date: r.day, class: 'uncompleted' });
-            }
-          }
-        });
+      powToText({ powType, ratio }) {
+        let result = powType.slice(3);
+        if (powType.includes('Increase')) {
+          result = powType.replace('Increase', '');
+          result += '*' + ratio * 100 + '%';
+        } else {
+          result = powType.replace('Reduce', '');
+          result += '/' + ratio * 100 + '%';
+        }
+        result = result.replace(/([A-Z])/g, ' $1');
+        result = result.charAt(0).toUpperCase() + result.slice(1);
         return result;
-      },
-      calcProgress({ willId, period, cycle }) {
-        let now = moment();
-        let powCount = 0;
-        this.records.forEach(record => {
-          if (!record.willId == willId) {
-            return;
-          }
-          let recordDate = moment(record.day, 'D/M/YYYY');
-          if (
-            recordDate.isAfter(now.subtract(period, cycle + 's')) &&
-            record.completed
-          ) {
-            powCount++;
-          }
-        });
-        return powCount;
       },
       calcCurrentPows(activeName) {
         return this.findPows({
@@ -189,15 +268,38 @@
       }),
       ...mapGetters('check-records', {
         records: 'list'
-      })
-    },
-    mounted() {
-      if (this.commitments.length > 0) {
-        this.activeName = this.commitments[0]._id;
-      } else if (this.perseverances.length > 0) {
-        this.activeName = this.perseverances[0]._id;
-      } else if (this.restraints.length > 0) {
-        this.activeName = this.restraints[0]._id;
+      }),
+
+      markedDates() {
+        let result = [];
+        this.records.forEach(r => {
+          if (r.willId == this.activeName) {
+            if (r.completed) {
+              result.push({ date: r.date, class: 'completed' });
+            } else {
+              result.push({ date: r.date, class: 'uncompleted' });
+            }
+          }
+        });
+        return result;
+      },
+      calcedData() {
+        let result = { columns: ['Success', 'Count'], rows: [] };
+        let completed = 0;
+        let uncompleted = 0;
+        this.records.forEach(r => {
+          if (r.willId == this.activeName) {
+            if (r.completed) {
+              completed++;
+            } else {
+              uncompleted++;
+            }
+          }
+        });
+        result.rows.push({ Success: 'Success', Count: completed });
+        result.rows.push({ Success: 'Fail', Count: uncompleted });
+        console.log(result);
+        return result;
       }
     }
   };
