@@ -20,18 +20,21 @@ module.exports = function(app) {
     let { data: records } = await app
       .service('wills/check-records')
       .find({ query: { willId: result.willId, willType: result.willType } });
-    records.forEach(record => {
-      let recordDate = moment(record.date, 'D/M/YYYY');
-      if (
-        recordDate.isAfter(now.subtract(result.period, result.cycle + 's')) &&
-        record.completed
-      ) {
-        powCount++;
-      }
-    });
+    if (records.length > 0) {
+      records.forEach(record => {
+        let recordDate = moment(record.date, 'D/M/YYYY');
+        if (
+          recordDate.isAfter(now.subtract(result.period, result.cycle + 's')) &&
+          record.completed
+        ) {
+          powCount++;
+        }
+      });
+    }
     if (powCount < result.target) {
       result.powType = undefined;
     }
+
     result.progress = powCount;
     return result;
   };
@@ -39,6 +42,7 @@ module.exports = function(app) {
   service.create = async function(data, params) {
     let result = await this._create(data, params);
     result.powType = undefined;
+    result.progress = 0;
     return result;
   };
   // Initialize our service with any options it requires
