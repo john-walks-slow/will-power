@@ -61,7 +61,7 @@ module.exports = function(app) {
         delta: Math.round(
           (original.progress < original.target
             ? (1 / original.target) * (original.cycle === 'day' ? 1 : 3)
-            : 0.5 / original.progress) * 50
+            : 0) * 50
         ),
         stayOriginal: false,
         notify: true
