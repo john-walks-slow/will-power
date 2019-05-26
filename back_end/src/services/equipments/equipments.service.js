@@ -4,7 +4,7 @@ const createModel = require('../../models/equipments.model');
 const _patchDelta = require('../../utils/_patchDelta');
 const makePatchAction = require('../../utils/makePatchAction');
 const joinFind = require('../../utils/joinFind');
-
+const findFromGets = require('../../utils/findFromGets');
 const hooks = require('./equipments.hooks');
 
 module.exports = function(app) {
@@ -49,13 +49,7 @@ module.exports = function(app) {
     }
     return Object.assign(equipmentDetail, equipment);
   };
-  service.find = async function(params) {
-    var results = await this._find(params);
-    for (let equipment of results.data) {
-      Object.assign(equipment, await this.get(equipment._id));
-    }
-    return results;
-  };
+  service.find = findFromGets;
   service.create = async function(data) {
     let payResult = await app.service('knights')._patchDelta(data.userId, {
       field: 'willGem',

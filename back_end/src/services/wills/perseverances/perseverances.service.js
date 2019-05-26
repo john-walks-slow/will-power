@@ -4,37 +4,10 @@ const createModel = require('../../../models/perseverances.model');
 const hooks = require('./perseverances.hooks');
 const makePatchAction = require('../../../utils/makePatchAction');
 const sameDay = require('../../../utils/sameDay');
+const findFromGets = require('../../../utils/findFromGets');
 var moment = require('moment');
-
-const POW_TYPES = [
-  'powIncreaseDamage',
-  'powReduceDamage',
-  'powIncreaseCriticalHitPossibility',
-  'powIncreaseCriticalHitDamage',
-  'powReduceWpConsumption',
-  'powIncreaseWpGain',
-  'powIncreaseWillGemGain'
-];
-const POW_MAP = {
-  day: [
-    { target: 3, period: 3, ratio: 1.5 },
-    { target: 7, period: 8, ratio: 1.5 },
-    { target: 30, period: 33, ratio: 3 },
-    { target: 60, period: 70, ratio: 3 },
-    { target: 100, period: 110, ratio: 6 },
-    { target: 200, period: 220, ratio: 6 },
-    { target: 300, period: 330, ratio: 10 }
-  ],
-  week: [
-    { target: 2, period: 2, ratio: 1.5 },
-    { target: 4, period: 5, ratio: 1.5 },
-    { target: 6, period: 8, ratio: 3 },
-    { target: 9, period: 11, ratio: 3 },
-    { target: 16, period: 19, ratio: 6 },
-    { target: 32, period: 37, ratio: 6 },
-    { target: 48, period: 56, ratio: 10 }
-  ]
-};
+const POW_MAP = require('../powMap');
+const POW_TYPES = require('../powTypes');
 
 module.exports = function(app) {
   const Model = createModel(app);
@@ -61,13 +34,7 @@ module.exports = function(app) {
     }
     return Object.assign(result, { records, progress });
   };
-  service.find = async function(params) {
-    var results = await this._find(params);
-    for (let perseverance of results.data) {
-      Object.assign(perseverance, await this.get(perseverance._id));
-    }
-    return results;
-  };
+  service.find = findFromGets;
   service.create = async function(data, params) {
     let result = await service._create(data, params);
     for (let pow of POW_MAP[result.cycle]) {

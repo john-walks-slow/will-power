@@ -141,6 +141,7 @@ module.exports = function(app) {
       notify: false
     });
     if (damageSource) {
+      // TODO: better report
       app.service('messages').create({
         userId: original._id,
         title: 'You Are Attacked When You Are Offline',
@@ -162,12 +163,12 @@ module.exports = function(app) {
     });
   };
 
-  service._checkDailyWills = async function(_id) {
+  service._checkWills = async function(_id, cycle) {
     let serviceCommitment = app.service('wills/commitments');
     let serviceRestraint = app.service('wills/restraints');
     let servicePerseverance = app.service('wills/perseverances');
     let { data: commitments } = await serviceCommitment.find({
-      query: { userId: _id, cycle: 'day' }
+      query: { userId: _id, cycle: cycle }
     });
     let uncompleted = [];
     let completed = [];
@@ -184,7 +185,7 @@ module.exports = function(app) {
       }
     });
     let { data: perseverances } = await servicePerseverance.find({
-      query: { userId: _id, cycle: 'day' }
+      query: { userId: _id, cycle: cycle }
     });
     perseverances.forEach(c => {
       app.service('wills/check-records').create({
@@ -199,7 +200,7 @@ module.exports = function(app) {
       }
     });
     let { data: restraints } = await serviceRestraint.find({
-      query: { userId: _id, cycle: 'day' }
+      query: { userId: _id, cycle: cycle }
     });
     restraints.forEach(c => {
       app.service('wills/check-records').create({
@@ -214,81 +215,20 @@ module.exports = function(app) {
       }
     });
     let original = await this.get(_id);
-    this._patchDelta(_id, {
-      field: 'wp',
-      max: original.maxWp,
-      delta: 60 * completed.length,
-      stayOriginal: false,
-      notify: true
-    });
+
     if (uncompleted.length > 0) {
       this._attacked(_id, uncompleted);
+    } else {
+      this._patchDelta(_id, {
+        field: 'wp',
+        max: original.maxWp,
+        delta: 60 * completed.length,
+        stayOriginal: false,
+        notify: true
+      });
     }
   };
 
-  service._checkWeeklyWills = async function(_id) {
-    let serviceCommitment = app.service('wills/commitments');
-    let serviceRestraint = app.service('wills/restraints');
-    let servicePerseverance = app.service('wills/perseverances');
-    let { data: commitments } = await serviceCommitment.find({
-      query: { userId: _id, cycle: 'week' }
-    });
-    let uncompleted = [];
-    let completed = [];
-    commitments.forEach(c => {
-      app.service('wills/check-records').create({
-        userId: _id,
-        willType: 'commitment',
-        willId: c._id,
-        completed: c.progress >= c.target,
-        date: moment().format('D/M/YYYY')
-      });
-      if (c.progress < c.target) {
-        uncompleted.push(c.name);
-      }
-    });
-    let { data: perseverances } = await servicePerseverance.find({
-      query: { userId: _id, cycle: 'week' }
-    });
-    perseverances.forEach(c => {
-      app.service('wills/check-records').create({
-        userId: _id,
-        willType: 'perseverance',
-        willId: c._id,
-        completed: c.progress >= c.target,
-        date: moment().format('D/M/YYYY')
-      });
-      if (c.progress < c.target) {
-        uncompleted.push(c.name);
-      }
-    });
-    let { data: restraints } = await serviceRestraint.find({
-      query: { userId: _id, cycle: 'week' }
-    });
-    restraints.forEach(c => {
-      app.service('wills/check-records').create({
-        userId: _id,
-        willType: 'restraint',
-        willId: c._id,
-        completed: c.progress <= c.target,
-        date: moment().format('D/M/YYYY')
-      });
-      if (c.progress > c.target) {
-        completed.push(c.name);
-      }
-    });
-    let original = await this.get(_id);
-    this._patchDelta(_id, {
-      field: 'wp',
-      max: original.maxWp,
-      delta: 200 * completed.length,
-      stayOriginal: false,
-      notify: true
-    });
-    if (uncompleted.length > 0) {
-      this._attacked(_id, uncompleted);
-    }
-  };
   // Initialize our service with any options it requires
   app.use('/knights', service);
 

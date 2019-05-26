@@ -2,6 +2,7 @@
 const createService = require('feathers-nedb');
 const createModel = require('../../models/proof-of-wills.model');
 const hooks = require('./proof-of-wills.hooks');
+const findFromGets = require('../../utils/findFromGets');
 const moment = require('moment');
 module.exports = function(app) {
   const Model = createModel(app);
@@ -12,32 +13,36 @@ module.exports = function(app) {
     paginate
   };
   let service = createService(options);
-  service.find = async function(params) {
-    let { data: pows } = await this._find(params);
+  service.get = async function(id, params) {
+    let now = moment();
+    let result = await this._get(id, params);
+    let powCount = 0;
     let { data: records } = await app
       .service('wills/check-records')
-      .find({ query: { willId: params.willId, willType: params.willType } });
-    let now = moment();
-    pows.forEach(pow => {
-      let powCount = 0;
+      .find({ query: { willId: result.willId, willType: result.willType } });
+    if (records.length > 0) {
       records.forEach(record => {
-        let recordDate = moment(record.day, 'D/M/YYYY');
+        let recordDate = moment(record.date, 'D/M/YYYY');
         if (
-          recordDate.isAfter(now.subtract(pow.period, pow.cycle + 's')) &&
+          recordDate.isAfter(now.subtract(result.period, result.cycle + 's')) &&
           record.completed
         ) {
           powCount++;
         }
       });
-      if (powCount < pow.target) {
-        pow.powType = undefined;
-      }
-    });
-    return { data: pows };
+    }
+    if (powCount < result.target) {
+      result.powType = undefined;
+    }
+
+    result.progress = powCount;
+    return result;
   };
+  service.find = findFromGets;
   service.create = async function(data, params) {
     let result = await this._create(data, params);
     result.powType = undefined;
+    result.progress = 0;
     return result;
   };
   // Initialize our service with any options it requires
