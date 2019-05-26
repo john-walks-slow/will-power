@@ -2,7 +2,7 @@ const { authenticate } = require('@feathersjs/authentication').hooks;
 const MONSTERS_EVERY_LEVEL = 5;
 async function progressLevelIfMonsterDie(context) {
   if (context.result.hp && context.result.hp <= 0) {
-    let delta = Math.round((Math.random() + 1) * context.result.level * 15);
+    let delta = Math.round((Math.random() + 1) * context.result.level * 35);
     // gain will gem
     if (context.result.levelProgress === 6) {
       delta *= context.result.level * 2;
