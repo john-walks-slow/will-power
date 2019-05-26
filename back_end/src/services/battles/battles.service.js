@@ -19,14 +19,14 @@ module.exports = function(app) {
   function calculateMonster(monster, level) {
     return {
       name: monster.name,
-      maxHp: Math.round(monster.maxHp * Math.pow(1.3, level - 1)),
+      maxHp: Math.round(monster.maxHp * Math.pow(1.6, level - 1)),
       damage: Math.round(monster.damage * Math.pow(1.2, level - 1))
     };
   }
   function calculateBoss(monster, level) {
     return {
       name: monster.name,
-      maxHp: Math.round(monster.maxHp * Math.pow(1.3, level - 1)) * level,
+      maxHp: Math.round(monster.maxHp * Math.pow(2, level - 1)) * level,
       damage: Math.round(monster.damage * Math.pow(1.2, level))
     };
   }
