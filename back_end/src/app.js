@@ -34,9 +34,8 @@ app.use(express.urlencoded({ extended: true }));
 // Host the dist folder only in production
 if (app.get('public')) {
   app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
-  app.use(express.static(app.get('public')));
   app.use(history({ verbose: true }));
-  app.use(express.static(app.get('public')));
+  app.use('/', express.static(app.get('public')));
 }
 // Set up Plugins and providers
 app.configure(express.rest());

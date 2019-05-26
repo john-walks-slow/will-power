@@ -4,7 +4,10 @@ const createModel = require('../../../models/restraints.model');
 const hooks = require('./restraints.hooks');
 const makePatchAction = require('../../../utils/makePatchAction');
 const sameDay = require('../../../utils/sameDay');
+const findFromGets = require('../../../utils/findFromGets');
 var moment = require('moment');
+const POW_MAP = require('../powMap');
+const POW_TYPES = require('../powTypes');
 
 module.exports = function(app) {
   const Model = createModel(app);
@@ -35,15 +38,22 @@ module.exports = function(app) {
       progress
     });
   };
-  service.find = async function(params) {
-    var results = await this._find(params);
-    for (let restraint of results.data) {
-      Object.assign(restraint, await this.get(restraint._id));
-    }
-    return results;
-  };
+  service.find = findFromGets;
   service.create = async function(data, params) {
     let result = await service._create(data, params);
+    for (let pow of POW_MAP[result.cycle]) {
+      let random = Math.floor(Math.random() * POW_TYPES.length);
+      await app.service('wills/proof-of-wills').create({
+        userId: result.userId,
+        willId: result._id,
+        willType: 'restraint',
+        cycle: result.cycle,
+        target: pow.target,
+        period: pow.period,
+        ratio: pow.ratio,
+        powType: POW_TYPES[random]
+      });
+    }
     return await this.get(result._id);
   };
   service.patch = makePatchAction({

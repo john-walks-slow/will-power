@@ -26,10 +26,10 @@
     <el-tooltip class="item" effect="dark" content="Pows" placement="top">
       <el-button
         class="buttonMenu"
-        id="buttonAchievementPanel"
+        id="buttonPowPanel"
         circle
-        @click="toggleAchievementPanel"
-        ><img class="imgButton" :src="ICON_ACHIEVEMENT" alt="" srcset=""
+        @click="togglePowPanel"
+        ><img class="imgButton" :src="ICON_POW" alt="" srcset=""
       /></el-button>
     </el-tooltip>
     <el-tooltip class="item" effect="dark" content="Wills" placement="top">
@@ -47,7 +47,7 @@
   #divContainer {
     position: fixed;
     /* left: 380px;
-                                                                                                                                                                                                                                                                                            top: 40px; */
+                                                                                                                                                                                                                                                                                              top: 40px; */
     bottom: 30px;
     left: 30px;
   }
@@ -73,7 +73,7 @@
     right: 2px;
   }
 
-  #buttonAchievementPanel {
+  #buttonPowPanel {
     border: 4px solid rgb(229, 123, 255);
   }
   .imgButton {
@@ -111,7 +111,7 @@
       return {
         ICON_EQUIPMENT: ASSETS_UI['IconEquipment.png'],
         ICON_WILL: ASSETS_UI['IconWill.png'],
-        ICON_ACHIEVEMENT: ASSETS_UI['IconAchievement.png'],
+        ICON_POW: ASSETS_UI['IconAchievement.png'],
         ICON_LEADERBOARD: ASSETS_UI['IconLeaderboard.png'],
         ICON_TREASURE: ASSETS_UI['IconTreasure.png']
       };
@@ -123,8 +123,8 @@
       toggleEquipmentPanel() {
         this.$emit('toggleEquipmentPanel');
       },
-      toggleAchievementPanel() {
-        this.$emit('toggleAchievementPanel');
+      togglePowPanel() {
+        this.$emit('togglePowPanel');
       },
       toggleLeaderboardPanel() {
         this.$emit('toggleLeaderboardPanel');
