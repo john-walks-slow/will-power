@@ -7,7 +7,7 @@
     <MenuBar
       @toggleWillPanel="toggleWillPanel"
       @toggleEquipmentPanel="toggleEquipmentPanel"
-      @toggleAchievementPanel="toggleAchievementPanel"
+      @togglePowPanel="togglePowPanel"
       @toggleLeaderboardPanel="toggleLeaderboardPanel"
     />
     <GameProgressView />
@@ -16,10 +16,7 @@
       :open="isEquipmentPanelOpen"
       @close="toggleEquipmentPanel"
     />
-    <AchievementPanel
-      :open="isAchievementPanelOpen"
-      @close="toggleAchievementPanel"
-    />
+    <PowPanel :open="isPowPanelOpen" @close="togglePowPanel" />
     <LeaderboardPanel
       :open="isLeaderboardPanelOpen"
       @close="toggleLeaderboardPanel"
@@ -86,7 +83,7 @@
   import GameProgressView from 'components/home/GameProgressView.vue';
   import WillPanel from 'components/home/WillPanel/WillPanel.vue';
   import EquipmentPanel from 'components/home/EquipmentPanel/EquipmentPanel.vue';
-  import AchievementPanel from 'components/home/AchievementPanel/AchievementPanel.vue';
+  import PowPanel from 'components/home/PowPanel/PowPanel.vue';
   import LeaderboardPanel from 'components/home/LeaderboardPanel/LeaderboardPanel.vue';
   import GameMessage from 'components/home/GameMessage.vue';
   import ErrorMessage from 'components/home/ErrorMessage.vue';
@@ -107,7 +104,7 @@
       KnightStatusView,
       MenuBar,
       GameProgressView,
-      AchievementPanel,
+      PowPanel,
       ErrorMessage,
       GameMessage,
       EffectCanvas,
@@ -119,7 +116,7 @@
         apiLoadingProgress: 0,
         isWillPanelOpen: false,
         isEquipmentPanelOpen: false,
-        isAchievementPanelOpen: false,
+        isPowPanelOpen: false,
         isLeaderboardPanelOpen: false,
 
         isError: false,
@@ -139,7 +136,7 @@
         return this.isWillPanelOpen ||
           this.isEquipmentPanelOpen ||
           this.isLeaderboardPanelOpen ||
-          this.isAchievementPanelOpen
+          this.isPowPanelOpen
           ? 0
           : 1;
       },
@@ -152,17 +149,17 @@
       toggleWillPanel() {
         this.isWillPanelOpen = !this.isWillPanelOpen;
         this.isEquipmentPanelOpen = false;
-        this.isAchievementPanelOpen = false;
+        this.isPowPanelOpen = false;
         this.isLeaderboardPanelOpen = false;
       },
       toggleEquipmentPanel() {
         this.isEquipmentPanelOpen = !this.isEquipmentPanelOpen;
         this.isWillPanelOpen = false;
-        this.isAchievementPanelOpen = false;
+        this.isPowPanelOpen = false;
         this.isLeaderboardPanelOpen = false;
       },
-      toggleAchievementPanel() {
-        this.isAchievementPanelOpen = !this.isAchievementPanelOpen;
+      togglePowPanel() {
+        this.isPowPanelOpen = !this.isPowPanelOpen;
         this.isEquipmentPanelOpen = false;
         this.isWillPanelOpen = false;
         this.isLeaderboardPanelOpen = false;
@@ -171,7 +168,7 @@
         this.isLeaderboardPanelOpen = !this.isLeaderboardPanelOpen;
         this.isEquipmentPanelOpen = false;
         this.isWillPanelOpen = false;
-        this.isAchievementPanelOpen = false;
+        this.isPowPanelOpen = false;
       },
       ...mapActions('auth', ['authenticate']),
       ...mapActions('commitments', { findCommitments: 'find' }),

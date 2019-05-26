@@ -2,7 +2,7 @@
   <transition name="zoom">
     <Panel
       title="POWS"
-      :imgSrc="ICON_ACHIEVEMENT"
+      :imgSrc="ICON_POW"
       v-if="open"
       color="#d784f8"
       :closePanel="closePanel"
@@ -220,7 +220,7 @@
     data() {
       return {
         activeName: undefined,
-        ICON_ACHIEVEMENT: ASSETS_UI['IconAchievement.png'],
+        ICON_POW: ASSETS_UI['IconAchievement.png'],
         calendarData: {}
       };
     },
