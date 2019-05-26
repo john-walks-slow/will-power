@@ -18,6 +18,7 @@ module.exports = {
     create: [],
     update: [],
     patch: [
+      // TODO: death punishment
       async function(context) {
         if (context.result.hp && context.result.hp <= 0) {
           let battle = await context.app

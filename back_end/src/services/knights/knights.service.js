@@ -141,6 +141,7 @@ module.exports = function(app) {
       notify: false
     });
     if (damageSource) {
+      // TODO: better report
       app.service('messages').create({
         userId: original._id,
         title: 'You Are Attacked When You Are Offline',
