@@ -1,6 +1,6 @@
 {
-  "host": "localhost",
-  "port": 8080,
+  "host": "powerofwill.herokuapp.com",
+  "port": undefined,
   "public": "../dist/",
   "nedb": "../data"
 }
