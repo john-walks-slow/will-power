@@ -25,7 +25,7 @@
     "test": "npm run eslint && NODE_ENV= npm run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "mocha": "mocha test/ --recursive --exit",
-    "clean-data": "fsys --task=emptyDir --dir=./data",
+    "clean-data": "rm -rf ./data && mkdir ./data",
     "init": "npm run clean-data && cd ./init && node initEquipmentDb.js && node initMonsterDb.js",
     "dev": "cross-env NODE_ENV=development nodemon src/",
     "prod": "pm2 restart ecosystem.config.js --env production",
