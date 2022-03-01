@@ -18,6 +18,7 @@
   },
   "scripts": {
     "install": "cd back_end && npm install",
+    "postinstall": "npm i -g pm2",
     "start": "cd back_end && npm run prod"
   }
 }
