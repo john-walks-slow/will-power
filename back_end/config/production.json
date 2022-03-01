@@ -1,5 +1,6 @@
 {
   "host": "powerofwill.herokuapp.com",
+  "port": "PORT",
   "public": "../dist/",
   "nedb": "../data"
 }
