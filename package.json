@@ -18,7 +18,7 @@
   },
   "scripts": {
     "install": "cd back_end && npm install && cd ../front_end && npm install",
-    "postinstall": "npm i -g fsys && cd back_end && npm run init",
+    "postinstall": "npm i -g node-fs-extra-cli && cd back_end && npm run init",
     "deploy": "cd front_end && npm run deploy",
     "start": "cd back_end && npm run start"
   }
