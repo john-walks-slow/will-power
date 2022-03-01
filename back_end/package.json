@@ -27,6 +27,7 @@
     "mocha": "mocha test/ --recursive --exit",
     "clean-data": "rm -rf ./data && mkdir ./data",
     "init": "npm run clean-data && cd ./init && node initEquipmentDb.js && node initMonsterDb.js",
+    "start": "cross-env NODE_ENV=production node src/",
     "dev": "cross-env NODE_ENV=development nodemon src/",
     "prod": "pm2 restart ecosystem.config.js --env production",
     "prod-test": "pm2 restart ecosystem.config.js --env development",
