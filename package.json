@@ -19,6 +19,6 @@
   "scripts": {
     "install": "cd back_end && npm install",
     "postinstall": "cd back_end && npm run init",
-    "start": "cd back_end/src && node index.js"
+    "start": "cd back_end && npm run start"
   }
 }
